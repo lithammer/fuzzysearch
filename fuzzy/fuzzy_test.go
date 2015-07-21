@@ -32,3 +32,8 @@ func BenchmarkFuzzySearch(b *testing.B) {
 		Search("twl", "cartwheel")
 	}
 }
+
+func ExampleFuzzySearch() {
+	fmt.Print(Search("twl", "cartwheel"))
+	// Output: true
+}
