@@ -5,13 +5,11 @@ import (
 	"testing"
 )
 
-type testVector struct {
+var fuzzyTests = []struct {
 	needle   string
 	haystack string
-	match    bool
-}
-
-var fuzzyTestVectors = []testVector{
+	wanted   bool
+}{
 	{"twl", "cartwheel", true},
 	{"cart", "cartwheel", true},
 	{"cw", "cartwheel", true},
@@ -22,10 +20,10 @@ var fuzzyTestVectors = []testVector{
 }
 
 func TestFuzzyMatch(t *testing.T) {
-	for _, v := range fuzzyTestVectors {
-		m := Search(v.needle, v.haystack)
-		if m != v.match {
-			t.Errorf("%s in %s expected match to be %t, got %t", v.needle, v.haystack, v.match, m)
+	for _, v := range fuzzyTests {
+		match := Search(v.needle, v.haystack)
+		if match != v.wanted {
+			t.Errorf("%s in %s expected match to be %t, got %t", v.needle, v.haystack, v.wanted, match)
 		}
 	}
 }
