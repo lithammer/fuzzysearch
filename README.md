@@ -1,7 +1,7 @@
 # Fuzzy Search
 
 [![Build Status](https://travis-ci.org/renstrom/fuzzysearch.svg?branch=master)](https://travis-ci.org/renstrom/fuzzysearch)
-[![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/renstrom/fuzzysearch)
+[![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy)
 
 A Go port of _[bevacqua's/fuzzysearch][1]_ written in JavaScript.
 
