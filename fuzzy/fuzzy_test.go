@@ -1,6 +1,9 @@
 package fuzzy
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 type testVector struct {
 	needle   string
