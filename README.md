@@ -3,11 +3,11 @@
 [![Build Status](https://travis-ci.org/renstrom/fuzzysearch.svg?branch=master)](https://travis-ci.org/renstrom/fuzzysearch)
 [![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy)
 
-A Go port of _[bevacqua's/fuzzysearch][1]_ written in JavaScript.
+A Go port of _[bevacqua/fuzzysearch][1]_ written in JavaScript.
 
 Fuzzy searching allows for flexibly matching a string with partial input, useful for filtering data very quickly based on lightweight user input.
 
-Returns `true` if `needle` matches `haystack` using a fuzzy-searching algorithm. Note that this program doesn't implement _[levenshtein distance][2]_, but rather a simplified version where **there's no approximation**. The method will return `true` only if each character in the `needle` can be found in the `haystack` and occurs after the preceding matches.
+Returns `true` if `needle` matches `haystack` using a fuzzy-searching algorithm. Note that this program doesn't implement _[Levenshtein distance][2]_, but rather a simplified version where **there's no approximation**. The method will return `true` only if each character in the `needle` can be found in the `haystack` and occurs after the preceding matches.
 
 The current implementation uses the algorithm suggested by Mr. Aleph, a russian compiler engineer working at V8.
 
