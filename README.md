@@ -31,7 +31,7 @@ fuzzy.Search("dog", "cartwheel")  // false
 fuzzy.RankSearch("kitten", "sitten") // 3
 
 words := []string{"cartwheel", "foobar", "wheel", "baz"})
-fuzzy.SearchMany("whl", words) // [cartwheel, wheel]
+fuzzy.SearchMany("whl", words) // [cartwheel wheel]
 
 fuzzy.RankSearchMany("whl", words) // [{cartwheel 6} {wheel 2}]
 ```

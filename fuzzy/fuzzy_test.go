@@ -82,7 +82,22 @@ func BenchmarkFuzzySearch(b *testing.B) {
 	}
 }
 
-func ExampleFuzzySearch() {
+func ExampleSearch() {
 	fmt.Print(Search("twl", "cartwheel"))
 	// Output: true
+}
+
+func ExampleSearchMany() {
+	fmt.Print(SearchMany("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
+	// Output: [cartwheel wheel]
+}
+
+func ExampleRankSearch() {
+	fmt.Print(RankSearch("twl", "cartwheel"))
+	// Output: 6
+}
+
+func ExampleRankSearchMany() {
+	fmt.Print(RankSearchMany("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
+	// Output: [{cartwheel 6} {wheel 2}]
 }
