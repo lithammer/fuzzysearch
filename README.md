@@ -28,7 +28,7 @@ fuzzy.Find("whl", words) // [cartwheel wheel]
 fuzzy.RankFind("whl", words) // [{cartwheel 6} {wheel 2}]
 ```
 
-You can sort the result of a `fuzzy.RankFind()` call as using the [`sort`](https://golang.org/pkg/sort/) package in the standard library:
+You can sort the result of a `fuzzy.RankFind()` call using the [`sort`](https://golang.org/pkg/sort/) package in the standard library:
 
 ```go
 matches := fuzzy.RankFind("whl", words) // [{cartwheel 6} {wheel 2}]
