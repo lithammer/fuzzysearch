@@ -20,9 +20,9 @@ var fuzzyTests = []struct {
 	{"dog", "cartwheel", false, -1},
 }
 
-func TestFuzzySearch(t *testing.T) {
+func TestFuzzyMatch(t *testing.T) {
 	for _, val := range fuzzyTests {
-		match := Search(val.needle, val.haystack)
+		match := Match(val.needle, val.haystack)
 		if match != val.wanted {
 			t.Errorf("%s in %s expected match to be %t, got %t",
 				val.needle, val.haystack, val.wanted, match)
@@ -30,11 +30,11 @@ func TestFuzzySearch(t *testing.T) {
 	}
 }
 
-func TestFuzzySearchMany(t *testing.T) {
+func TestFuzzyFind(t *testing.T) {
 	haystack := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []string{"cartwheel", "wheel"}
 
-	matches := SearchMany("whl", haystack)
+	matches := Find("whl", haystack)
 
 	if len(matches) != len(wanted) {
 		t.Errorf("expected %s, got %s", wanted, matches)
@@ -47,23 +47,23 @@ func TestFuzzySearchMany(t *testing.T) {
 	}
 }
 
-func TestRankSearch(t *testing.T) {
+func TestRankMatch(t *testing.T) {
 	for _, val := range fuzzyTests {
-		rank := RankSearch(val.needle, val.haystack)
+		rank := RankMatch(val.needle, val.haystack)
 		if rank != val.rank {
 			t.Errorf("expected ranking %d, got %d", val.rank, rank)
 		}
 	}
 }
 
-func TestRankSearchMany(t *testing.T) {
+func TestRankFind(t *testing.T) {
 	haystack := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []Rank{
 		{"cartwheel", 6},
 		{"wheel", 2},
 	}
 
-	ranks := RankSearchMany("whl", haystack)
+	ranks := RankFind("whl", haystack)
 
 	if len(ranks) != len(wanted) {
 		t.Errorf("expected %+v, got %+v", wanted, ranks)
@@ -76,28 +76,34 @@ func TestRankSearchMany(t *testing.T) {
 	}
 }
 
-func BenchmarkFuzzySearch(b *testing.B) {
+func BenchmarkMatch(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		Search("twl", "cartwheel")
+		Match("kitten", "sitting")
 	}
 }
 
-func ExampleSearch() {
-	fmt.Print(Search("twl", "cartwheel"))
+func BenchmarkRankMatch(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		RankMatch("kitten", "sitting")
+	}
+}
+
+func ExampleMatch() {
+	fmt.Print(Match("twl", "cartwheel"))
 	// Output: true
 }
 
-func ExampleSearchMany() {
-	fmt.Print(SearchMany("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
+func ExampleFind() {
+	fmt.Print(Find("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
 	// Output: [cartwheel wheel]
 }
 
-func ExampleRankSearch() {
-	fmt.Print(RankSearch("twl", "cartwheel"))
+func ExampleRankMatch() {
+	fmt.Print(RankMatch("twl", "cartwheel"))
 	// Output: 6
 }
 
-func ExampleRankSearchMany() {
-	fmt.Print(RankSearchMany("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
+func ExampleRankFind() {
+	fmt.Print(RankFind("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
 	// Output: [{cartwheel 6} {wheel 2}]
 }

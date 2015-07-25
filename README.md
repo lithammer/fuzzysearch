@@ -13,27 +13,29 @@ The current implementation uses the algorithm suggested by Mr. Aleph, a russian 
 
 ## Differences to bevacqua/fuzzysearch
 
-Includes `SearchMany()`, which is a convenience function to help filter a list of words which mathes.
+The function `search()` has been renamed to `Match()`.
 
-Also, in contrast to the original JavaScript implementation, this library supplies two extra functions to help with ranking matches using Levenshtein distance. Namely `RankSearch()` and `RankSearchMany()`.
+Includes `Find()`, which is a convenience function to help filter a list of words which mathes.
+
+Also, in contrast to the original JavaScript implementation, this library supplies two extra functions to help with ranking matches using Levenshtein distance. Namely `RankMatch()` and `RankFind()`.
 
 ## Usage
 
 ```go
-fuzzy.Search("twl", "cartwheel")  // true
-fuzzy.Search("cart", "cartwheel") // true
-fuzzy.Search("cw", "cartwheel")   // true
-fuzzy.Search("ee", "cartwheel")   // true
-fuzzy.Search("art", "cartwheel")  // true
-fuzzy.Search("eeel", "cartwheel") // false
-fuzzy.Search("dog", "cartwheel")  // false
+fuzzy.Match("twl", "cartwheel")  // true
+fuzzy.Match("cart", "cartwheel") // true
+fuzzy.Match("cw", "cartwheel")   // true
+fuzzy.Match("ee", "cartwheel")   // true
+fuzzy.Match("art", "cartwheel")  // true
+fuzzy.Match("eeel", "cartwheel") // false
+fuzzy.Match("dog", "cartwheel")  // false
 
-fuzzy.RankSearch("kitten", "sitting") // 3
+fuzzy.RankMatch("kitten", "sitting") // 3
 
 words := []string{"cartwheel", "foobar", "wheel", "baz"})
-fuzzy.SearchMany("whl", words) // [cartwheel wheel]
+fuzzy.Find("whl", words) // [cartwheel wheel]
 
-fuzzy.RankSearchMany("whl", words) // [{cartwheel 6} {wheel 2}]
+fuzzy.RankFind("whl", words) // [{cartwheel 6} {wheel 2}]
 ```
 
 ## License
