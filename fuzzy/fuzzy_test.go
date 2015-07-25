@@ -2,6 +2,7 @@ package fuzzy
 
 import (
 	"fmt"
+	"sort"
 	"testing"
 )
 
@@ -68,6 +69,19 @@ func TestRankFind(t *testing.T) {
 	if len(ranks) != len(wanted) {
 		t.Errorf("expected %+v, got %+v", wanted, ranks)
 	}
+
+	for i := range wanted {
+		if wanted[i] != ranks[i] {
+			t.Errorf("expected %+v, got %+v", wanted, ranks)
+		}
+	}
+}
+
+func TestSortingRanks(t *testing.T) {
+	ranks := Ranks{{"b", 3}, {"c", 6}, {"a", 2}}
+	wanted := Ranks{{"a", 2}, {"b", 3}, {"c", 6}}
+
+	sort.Sort(ranks)
 
 	for i := range wanted {
 		if wanted[i] != ranks[i] {
