@@ -3,21 +3,11 @@
 [![Build Status](https://travis-ci.org/renstrom/fuzzysearch.svg?branch=master)](https://travis-ci.org/renstrom/fuzzysearch)
 [![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy)
 
-A Go port of _[bevacqua/fuzzysearch][1]_ (written in JavaScript).
+Inspired by _[bevacqua/fuzzysearch][1]_, a fuzzy matching library written in JavaScript. But contains some extras like ranking using _[Levenshtein distance][2]_ (see [`RankMatch()`](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy#RankMatch)) and finding matches in a list of words (see [`Find()`](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy#Find)).
 
 Fuzzy searching allows for flexibly matching a string with partial input, useful for filtering data very quickly based on lightweight user input.
 
-Returns `true` if `needle` matches `haystack` using a fuzzy-searching algorithm. Note that this program doesn't implement _[Levenshtein distance][2]_, but rather a simplified version where **there's no approximation**. The method will return `true` only if each character in the `needle` can be found in the `haystack` and occurs after the preceding matches.
-
 The current implementation uses the algorithm suggested by Mr. Aleph, a russian compiler engineer working at V8.
-
-## Differences to bevacqua/fuzzysearch
-
-The function `search()` has been renamed to `Match()`.
-
-Includes `Find()`, which is a convenience function to help filter a list of words which mathes.
-
-Also, in contrast to the original JavaScript implementation, this library supplies two extra functions to help with ranking matches using Levenshtein distance. Namely `RankMatch()` and `RankFind()`.
 
 ## Usage
 
@@ -36,6 +26,13 @@ words := []string{"cartwheel", "foobar", "wheel", "baz"})
 fuzzy.Find("whl", words) // [cartwheel wheel]
 
 fuzzy.RankFind("whl", words) // [{cartwheel 6} {wheel 2}]
+```
+
+You can sort the result of a `fuzzy.RankFind()` call as using the [`sort`](https://golang.org/pkg/sort/) package in the standard library:
+
+```go
+matches := fuzzy.RankFind("whl", words) // [{cartwheel 6} {wheel 2}]
+sort.Sort(matches) // [{wheel 2} {cartwheel 6}]
 ```
 
 ## License

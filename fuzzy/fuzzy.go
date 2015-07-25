@@ -1,6 +1,10 @@
 package fuzzy
 
-// Match does a partial match ("fuzzy search") of needle in haystack.
+// Match returns true if needle matches haystack using a fuzzy-searching
+// algorithm. Note that it doesn't implement Levenshtein distance (see
+// RankMatch instead), but rather a simplified version where there's no
+// approximation. The method will return true only if each character in the
+// needle can be found in the haystack and occurs after the preceding matches.
 func Match(needle, haystack string) bool {
 	nlen := len(needle)
 	hlen := len(haystack)
