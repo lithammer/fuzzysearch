@@ -8,20 +8,21 @@ package fuzzy
 // This implemention is optimized to use O(min(m,n)) space and is based on the
 // optimized C version found here:
 // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Levenshtein_distance#C
-func LevenshteinDistance(s1, s2 string) int {
-	column := make([]int, len(s1)+1)
+func LevenshteinDistance(s, t string) int {
+	r1, r2 := []rune(s), []rune(t)
+	column := make([]int, len(r1)+1)
 
-	for y := 1; y <= len(s1); y++ {
+	for y := 1; y <= len(r1); y++ {
 		column[y] = y
 	}
 
-	for x := 1; x <= len(s2); x++ {
+	for x := 1; x <= len(r2); x++ {
 		column[0] = x
 
-		for y, lastDiag := 1, x-1; y <= len(s1); y++ {
+		for y, lastDiag := 1, x-1; y <= len(r1); y++ {
 			oldDiag := column[y]
 			cost := 0
-			if s1[y-1] != s2[x-1] {
+			if r1[y-1] != r2[x-1] {
 				cost = 1
 			}
 			column[y] = min(column[y]+1, column[y-1]+1, lastDiag+cost)
@@ -29,7 +30,7 @@ func LevenshteinDistance(s1, s2 string) int {
 		}
 	}
 
-	return column[len(s1)]
+	return column[len(r1)]
 }
 
 func min(a, b, c int) int {
