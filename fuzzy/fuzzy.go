@@ -1,5 +1,7 @@
 package fuzzy
 
+import "unicode/utf8"
+
 // Match returns true if needle matches haystack using a fuzzy-searching
 // algorithm. Note that it doesn't implement Levenshtein distance (see
 // RankMatch instead), but rather a simplified version where there's no
@@ -16,12 +18,11 @@ func Match(needle, haystack string) bool {
 	if nlen == hlen {
 		return needle == haystack
 	}
-
 Outer:
-	for i, j := 0, 0; i < nlen; i++ {
-		for j < hlen {
-			j++
-			if needle[i] == haystack[j-1] {
+	for _, r1 := range needle {
+		for i, r2 := range haystack {
+			if r1 == r2 {
+				haystack = haystack[i+utf8.RuneLen(r2):]
 				continue Outer
 			}
 		}

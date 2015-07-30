@@ -19,6 +19,10 @@ var fuzzyTests = []struct {
 	{"art", "cartwheel", true, 6},
 	{"eeel", "cartwheel", false, -1},
 	{"dog", "cartwheel", false, -1},
+	{"ёлка", "ёлочка", true, 2},
+	{"ветер", "ёлочка", false, -1},
+	{"中国", "中华人民共和国", true, 5},
+	{"日本", "中华人民共和国", false, -1},
 }
 
 func TestFuzzyMatch(t *testing.T) {
@@ -52,7 +56,7 @@ func TestRankMatch(t *testing.T) {
 	for _, val := range fuzzyTests {
 		rank := RankMatch(val.needle, val.haystack)
 		if rank != val.rank {
-			t.Errorf("expected ranking %d, got %d", val.rank, rank)
+			t.Errorf("expected ranking %d, got %d for %s in %s", val.rank, rank, val.needle, val.haystack)
 		}
 	}
 }
