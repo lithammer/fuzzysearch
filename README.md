@@ -1,6 +1,6 @@
 # Fuzzy Search
 
-[![Build Status](http://img.shields.io/travis/renstrom/fuzzysearch.svg?style=flat-square)](https://travis-ci.org/renstrom/fuzzysearch)
+[![Build Status](https://img.shields.io/travis/renstrom/fuzzysearch.svg?style=flat-square)](https://travis-ci.org/renstrom/fuzzysearch)
 [![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy)
 
 Inspired by _[bevacqua/fuzzysearch][1]_, a fuzzy matching library written in JavaScript. But contains some extras like ranking using _[Levenshtein distance][2]_ (see [`RankMatch()`](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy#RankMatch)) and finding matches in a list of words (see [`Find()`](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy#Find)).
