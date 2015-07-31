@@ -43,8 +43,8 @@ func Find(source string, targets []string) []string {
 }
 
 // RankMatch is similar to Match except it will measure the Levenshtein
-// distance between the source and the target and return its result.
-// If there was no match, it will return -1.
+// distance between the source and the target and return its result. If there
+// was no match, it will return -1.
 func RankMatch(source, target string) int {
 	match := Match(source, target)
 	if !match {
@@ -53,8 +53,8 @@ func RankMatch(source, target string) int {
 	return LevenshteinDistance(source, target)
 }
 
-// RankFind is similar to Find, except it will also rank all matches
-// using Levenshtein distance.
+// RankFind is similar to Find, except it will also rank all matches using
+// Levenshtein distance.
 func RankFind(source string, targets []string) ranks {
 	var r ranks
 	for _, target := range Find(source, targets) {
