@@ -7,10 +7,10 @@ import (
 )
 
 var fuzzyTests = []struct {
-	source   string
+	source string
 	target string
-	wanted   bool
-	rank     int
+	wanted bool
+	rank   int
 }{
 	{"twl", "cartwheel", true, 6},
 	{"cart", "cartwheel", true, 5},
@@ -122,6 +122,6 @@ func ExampleRankMatch() {
 }
 
 func ExampleRankFind() {
-	fmt.Print(RankFind("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
-	// Output: [{whl cartwheel 6} {whl wheel 2}]
+	fmt.Printf("%+v", RankFind("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
+	// Output: [{Source:whl Target:cartwheel Distance:6} {Source:whl Target:wheel Distance:2}]
 }
