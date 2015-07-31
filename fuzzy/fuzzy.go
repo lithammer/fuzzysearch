@@ -51,20 +51,6 @@ type Rank struct {
 	Distance int
 }
 
-type Ranks []Rank
-
-func (r Ranks) Len() int {
-	return len(r)
-}
-
-func (r Ranks) Swap(i, j int) {
-	r[i], r[j] = r[j], r[i]
-}
-
-func (r Ranks) Less(i, j int) bool {
-	return r[i].Distance < r[j].Distance
-}
-
 // RankMatch is similar to Match except it will measure the Levenshtein
 // distance between the needle and the haystack and return its result.
 // If there was no match, it will return -1.
@@ -78,10 +64,27 @@ func RankMatch(needle, haystack string) int {
 
 // RankFind is similar to Find, except it will also rank all matches
 // using Levenshtein distance.
-func RankFind(needle string, haystacks []string) Ranks {
-	var ranks Ranks
-	for _, val := range Find(needle, haystacks) {
-		ranks = append(ranks, Rank{val, LevenshteinDistance(needle, val)})
+func RankFind(needle string, haystacks []string) ranks {
+	var r ranks
+	for _, word := range Find(needle, haystacks) {
+		r = append(r, Rank{
+			Word:   word,
+			Distance: LevenshteinDistance(needle, word),
+		})
 	}
-	return ranks
+	return r
+}
+
+type ranks []Rank
+
+func (r ranks) Len() int {
+	return len(r)
+}
+
+func (r ranks) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
+}
+
+func (r ranks) Less(i, j int) bool {
+	return r[i].Distance < r[j].Distance
 }

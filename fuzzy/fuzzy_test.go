@@ -82,14 +82,14 @@ func TestRankFind(t *testing.T) {
 }
 
 func TestSortingRanks(t *testing.T) {
-	ranks := Ranks{{"b", 3}, {"c", 6}, {"a", 2}}
-	wanted := Ranks{{"a", 2}, {"b", 3}, {"c", 6}}
+	rs := ranks{{"b", 1}, {"cc", 2}, {"a", 0}}
+	wanted := ranks{rs[2], rs[0], rs[1]}
 
-	sort.Sort(ranks)
+	sort.Sort(rs)
 
 	for i := range wanted {
-		if wanted[i] != ranks[i] {
-			t.Errorf("expected %+v, got %+v", wanted, ranks)
+		if wanted[i] != rs[i] {
+			t.Errorf("expected %+v, got %+v", wanted, rs)
 		}
 	}
 }
