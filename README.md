@@ -22,7 +22,7 @@ fuzzy.Match("dog", "cartwheel")  // false
 
 fuzzy.RankMatch("kitten", "sitting") // 3
 
-words := []string{"cartwheel", "foobar", "wheel", "baz"})
+words := []string{"cartwheel", "foobar", "wheel", "baz"}
 fuzzy.Find("whl", words) // [cartwheel wheel]
 
 fuzzy.RankFind("whl", words) // [{whl cartwheel 6} {whl wheel 2}]
