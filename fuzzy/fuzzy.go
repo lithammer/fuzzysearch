@@ -2,27 +2,24 @@ package fuzzy
 
 import "unicode/utf8"
 
-// Match returns true if needle matches haystack using a fuzzy-searching
+// Match returns true if source matches target using a fuzzy-searching
 // algorithm. Note that it doesn't implement Levenshtein distance (see
 // RankMatch instead), but rather a simplified version where there's no
 // approximation. The method will return true only if each character in the
-// needle can be found in the haystack and occurs after the preceding matches.
-func Match(needle, haystack string) bool {
-	nlen := len(needle)
-	hlen := len(haystack)
-
-	if nlen > hlen {
+// source can be found in the target and occurs after the preceding matches.
+func Match(source, target string) bool {
+	if len(source) > len(target) {
 		return false
 	}
 
-	if nlen == hlen {
-		return needle == haystack
+	if len(source) == len(target) {
+		return source == target
 	}
 Outer:
-	for _, r1 := range needle {
-		for i, r2 := range haystack {
+	for _, r1 := range source {
+		for i, r2 := range target {
 			if r1 == r2 {
-				haystack = haystack[i+utf8.RuneLen(r2):]
+				target = target[i+utf8.RuneLen(r2):]
 				continue Outer
 			}
 		}
@@ -32,14 +29,13 @@ Outer:
 	return true
 }
 
-// Find will return a list of strings in haysatcks that fuzzy matches
-// needle.
-func Find(needle string, haystacks []string) []string {
+// Find will return a list of strings in targets that fuzzy matches source.
+func Find(source string, targets []string) []string {
 	var matches []string
 
-	for _, haystack := range haystacks {
-		if Match(needle, haystack) {
-			matches = append(matches, haystack)
+	for _, target := range targets {
+		if Match(source, target) {
+			matches = append(matches, target)
 		}
 	}
 
@@ -47,25 +43,25 @@ func Find(needle string, haystacks []string) []string {
 }
 
 // RankMatch is similar to Match except it will measure the Levenshtein
-// distance between the needle and the haystack and return its result.
+// distance between the source and the target and return its result.
 // If there was no match, it will return -1.
-func RankMatch(needle, haystack string) int {
-	match := Match(needle, haystack)
+func RankMatch(source, target string) int {
+	match := Match(source, target)
 	if !match {
 		return -1
 	}
-	return LevenshteinDistance(needle, haystack)
+	return LevenshteinDistance(source, target)
 }
 
 // RankFind is similar to Find, except it will also rank all matches
 // using Levenshtein distance.
-func RankFind(needle string, haystacks []string) ranks {
+func RankFind(source string, targets []string) ranks {
 	var r ranks
-	for _, word := range Find(needle, haystacks) {
+	for _, target := range Find(source, targets) {
 		r = append(r, Rank{
-			Source:   needle,
-			Target:   word,
-			Distance: LevenshteinDistance(needle, word),
+			Source:   source,
+			Target:   target,
+			Distance: LevenshteinDistance(source, target),
 		})
 	}
 	return r

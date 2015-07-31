@@ -7,8 +7,8 @@ import (
 )
 
 var fuzzyTests = []struct {
-	needle   string
-	haystack string
+	source   string
+	target string
 	wanted   bool
 	rank     int
 }{
@@ -27,19 +27,19 @@ var fuzzyTests = []struct {
 
 func TestFuzzyMatch(t *testing.T) {
 	for _, val := range fuzzyTests {
-		match := Match(val.needle, val.haystack)
+		match := Match(val.source, val.target)
 		if match != val.wanted {
 			t.Errorf("%s in %s expected match to be %t, got %t",
-				val.needle, val.haystack, val.wanted, match)
+				val.source, val.target, val.wanted, match)
 		}
 	}
 }
 
 func TestFuzzyFind(t *testing.T) {
-	haystack := []string{"cartwheel", "foobar", "wheel", "baz"}
+	target := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []string{"cartwheel", "wheel"}
 
-	matches := Find("whl", haystack)
+	matches := Find("whl", target)
 
 	if len(matches) != len(wanted) {
 		t.Errorf("expected %s, got %s", wanted, matches)
@@ -54,21 +54,21 @@ func TestFuzzyFind(t *testing.T) {
 
 func TestRankMatch(t *testing.T) {
 	for _, val := range fuzzyTests {
-		rank := RankMatch(val.needle, val.haystack)
+		rank := RankMatch(val.source, val.target)
 		if rank != val.rank {
-			t.Errorf("expected ranking %d, got %d for %s in %s", val.rank, rank, val.needle, val.haystack)
+			t.Errorf("expected ranking %d, got %d for %s in %s", val.rank, rank, val.source, val.target)
 		}
 	}
 }
 
 func TestRankFind(t *testing.T) {
-	haystack := []string{"cartwheel", "foobar", "wheel", "baz"}
+	target := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []Rank{
 		{"whl", "cartwheel", 6},
 		{"whl", "wheel", 2},
 	}
 
-	ranks := RankFind("whl", haystack)
+	ranks := RankFind("whl", target)
 
 	if len(ranks) != len(wanted) {
 		t.Errorf("expected %+v, got %+v", wanted, ranks)
