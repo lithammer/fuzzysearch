@@ -1,3 +1,5 @@
+// Fuzzy searching allows for flexibly matching a string with partial input,
+// useful for filtering data very quickly based on lightweight user input.
 package fuzzy
 
 import "unicode/utf8"
