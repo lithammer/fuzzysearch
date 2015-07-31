@@ -64,8 +64,8 @@ func TestRankMatch(t *testing.T) {
 func TestRankFind(t *testing.T) {
 	haystack := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []Rank{
-		{"cartwheel", 6},
-		{"wheel", 2},
+		{"whl", "cartwheel", 6},
+		{"whl", "wheel", 2},
 	}
 
 	ranks := RankFind("whl", haystack)
@@ -82,7 +82,7 @@ func TestRankFind(t *testing.T) {
 }
 
 func TestSortingRanks(t *testing.T) {
-	rs := ranks{{"b", 1}, {"cc", 2}, {"a", 0}}
+	rs := ranks{{"a", "b", 1}, {"a", "cc", 2}, {"a", "a", 0}}
 	wanted := ranks{rs[2], rs[0], rs[1]}
 
 	sort.Sort(rs)
@@ -123,5 +123,5 @@ func ExampleRankMatch() {
 
 func ExampleRankFind() {
 	fmt.Print(RankFind("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
-	// Output: [{cartwheel 6} {wheel 2}]
+	// Output: [{whl cartwheel 6} {whl wheel 2}]
 }

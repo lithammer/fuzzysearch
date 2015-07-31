@@ -46,11 +46,6 @@ func Find(needle string, haystacks []string) []string {
 	return matches
 }
 
-type Rank struct {
-	Word     string
-	Distance int
-}
-
 // RankMatch is similar to Match except it will measure the Levenshtein
 // distance between the needle and the haystack and return its result.
 // If there was no match, it will return -1.
@@ -68,11 +63,21 @@ func RankFind(needle string, haystacks []string) ranks {
 	var r ranks
 	for _, word := range Find(needle, haystacks) {
 		r = append(r, Rank{
-			Word:   word,
+			Source:   needle,
+			Target:   word,
 			Distance: LevenshteinDistance(needle, word),
 		})
 	}
 	return r
+}
+
+type Rank struct {
+	// Source is used as the source for matching.
+	Source string
+	// Target is the word matched against.
+	Target string
+	// Distance is the Levenshtein distance between Source and Target.
+	Distance int
 }
 
 type ranks []Rank
