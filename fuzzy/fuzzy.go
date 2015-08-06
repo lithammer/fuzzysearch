@@ -10,25 +10,7 @@ import "unicode/utf8"
 // approximation. The method will return true only if each character in the
 // source can be found in the target and occurs after the preceding matches.
 func Match(source, target string) bool {
-	if len(source) > len(target) {
-		return false
-	}
-
-	if len(source) == len(target) {
-		return source == target
-	}
-Outer:
-	for _, r1 := range source {
-		for i, r2 := range target {
-			if r1 == r2 {
-				target = target[i+utf8.RuneLen(r2):]
-				continue Outer
-			}
-		}
-		return false
-	}
-
-	return true
+	return RankMatch(source, target) >= 0
 }
 
 // Find will return a list of strings in targets that fuzzy matches source.
@@ -48,11 +30,28 @@ func Find(source string, targets []string) []string {
 // distance between the source and the target and return its result. If there
 // was no match, it will return -1.
 func RankMatch(source, target string) int {
-	match := Match(source, target)
-	if !match {
+	lenDiff := utf8.RuneCountInString(target) - utf8.RuneCountInString(source)
+
+	if lenDiff < 0 {
 		return -1
 	}
-	return LevenshteinDistance(source, target)
+
+	if lenDiff == 0 && source == target {
+		return 0
+	}
+
+Outer:
+	for _, r1 := range source {
+		for i, r2 := range target {
+			if r1 == r2 {
+				target = target[i+utf8.RuneLen(r2):]
+				continue Outer
+			}
+		}
+		return -1
+	}
+
+	return lenDiff
 }
 
 // RankFind is similar to Find, except it will also rank all matches using
