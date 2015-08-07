@@ -30,7 +30,7 @@ func Find(source string, targets []string) []string {
 // distance between the source and the target and return its result. If there
 // was no match, it will return -1.
 func RankMatch(source, target string) int {
-	lenDiff := utf8.RuneCountInString(target) - utf8.RuneCountInString(source)
+	lenDiff := len(target) - len(source)
 
 	if lenDiff < 0 {
 		return -1
@@ -40,18 +40,27 @@ func RankMatch(source, target string) int {
 		return 0
 	}
 
+	runeDiff := 0
+
 Outer:
 	for _, r1 := range source {
 		for i, r2 := range target {
 			if r1 == r2 {
 				target = target[i+utf8.RuneLen(r2):]
 				continue Outer
+			} else {
+				runeDiff++
 			}
 		}
 		return -1
 	}
 
-	return lenDiff
+	// count up remaining char
+	for _, _ = range target {
+		runeDiff++
+	}
+
+	return runeDiff
 }
 
 // RankFind is similar to Find, except it will also rank all matches using

@@ -96,6 +96,13 @@ func TestSortingRanks(t *testing.T) {
 }
 
 func BenchmarkMatch(b *testing.B) {
+	ft := fuzzyTests[1]
+	for i := 0; i < b.N; i++ {
+		Match(ft.source, ft.target)
+	}
+}
+
+func BenchmarkMatchBig(b *testing.B) {
 	ft := fuzzyTests[0]
 	for i := 0; i < b.N; i++ {
 		Match(ft.source, ft.target)
@@ -103,6 +110,13 @@ func BenchmarkMatch(b *testing.B) {
 }
 
 func BenchmarkRankMatch(b *testing.B) {
+	ft := fuzzyTests[1]
+	for i := 0; i < b.N; i++ {
+		RankMatch(ft.source, ft.target)
+	}
+}
+
+func BenchmarkRankMatchBig(b *testing.B) {
 	ft := fuzzyTests[0]
 	for i := 0; i < b.N; i++ {
 		RankMatch(ft.source, ft.target)
