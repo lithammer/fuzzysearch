@@ -56,7 +56,8 @@ Outer:
 	}
 
 	// count up remaining char
-	for _, _ = range target {
+	for len(target) > 0 {
+		target = target[utf8.RuneLen(rune(target[0])):]
 		runeDiff++
 	}
 
