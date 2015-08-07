@@ -12,6 +12,8 @@ var fuzzyTests = []struct {
 	wanted bool
 	rank   int
 }{
+	{"zazz", fmt.Sprintf("%s zazz", DeBelloGallico), true, 1553},
+	{"zazz", fmt.Sprintf("zazz %s", DeBelloGallico), true, 1553},
 	{"twl", "cartwheel", true, 6},
 	{"cart", "cartwheel", true, 5},
 	{"cw", "cartwheel", true, 7},
@@ -95,14 +97,44 @@ func TestSortingRanks(t *testing.T) {
 }
 
 func BenchmarkMatch(b *testing.B) {
+	ft := fuzzyTests[2]
 	for i := 0; i < b.N; i++ {
-		Match("kitten", "sitting")
+		Match(ft.source, ft.target)
+	}
+}
+
+func BenchmarkMatchBigLate(b *testing.B) {
+	ft := fuzzyTests[0]
+	for i := 0; i < b.N; i++ {
+		Match(ft.source, ft.target)
+	}
+}
+
+func BenchmarkMatchBigEarly(b *testing.B) {
+	ft := fuzzyTests[1]
+	for i := 0; i < b.N; i++ {
+		Match(ft.source, ft.target)
 	}
 }
 
 func BenchmarkRankMatch(b *testing.B) {
+	ft := fuzzyTests[2]
 	for i := 0; i < b.N; i++ {
-		RankMatch("kitten", "sitting")
+		RankMatch(ft.source, ft.target)
+	}
+}
+
+func BenchmarkRankMatchBigLate(b *testing.B) {
+	ft := fuzzyTests[0]
+	for i := 0; i < b.N; i++ {
+		RankMatch(ft.source, ft.target)
+	}
+}
+
+func BenchmarkRankMatchBigEarly(b *testing.B) {
+	ft := fuzzyTests[1]
+	for i := 0; i < b.N; i++ {
+		RankMatch(ft.source, ft.target)
 	}
 }
 
