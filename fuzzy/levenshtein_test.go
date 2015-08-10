@@ -9,8 +9,8 @@ var levenshteinDistanceTests = []struct {
 	s, t   string
 	wanted int
 }{
-	{"zazz", fmt.Sprintf("%s zazz", DeBelloGallico), 1553},
-	{"zazz", fmt.Sprintf("zazz %s", DeBelloGallico), 1553},
+	{"zazz", fmt.Sprintf("%s zazz", deBelloGallico), 1553},
+	{"zazz", fmt.Sprintf("zazz %s", deBelloGallico), 1553},
 	{"a", "a", 0},
 	{"ab", "ab", 0},
 	{"ab", "aa", 1},
