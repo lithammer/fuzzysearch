@@ -1,11 +1,16 @@
 package fuzzy
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 var levenshteinDistanceTests = []struct {
 	s, t   string
 	wanted int
 }{
+	{"zazz", fmt.Sprintf("%s zazz", deBelloGallico), 1553},
+	{"zazz", fmt.Sprintf("zazz %s", deBelloGallico), 1553},
 	{"a", "a", 0},
 	{"ab", "ab", 0},
 	{"ab", "aa", 1},
@@ -29,8 +34,24 @@ func TestLevenshtein(t *testing.T) {
 }
 
 func BenchmarkLevenshteinDistance(b *testing.B) {
+	ldt := levenshteinDistanceTests[2]
+	ldt2 := levenshteinDistanceTests[5]
 	for i := 0; i < b.N; i++ {
-		LevenshteinDistance("aaa", "aba")
-		LevenshteinDistance("kitten", "sitting")
+		LevenshteinDistance(ldt.s, ldt.t)
+		LevenshteinDistance(ldt2.s, ldt2.t)
+	}
+}
+
+func BenchmarkLevenshteinDistanceBigLate(b *testing.B) {
+	ldt := levenshteinDistanceTests[0]
+	for i := 0; i < b.N; i++ {
+		LevenshteinDistance(ldt.s, ldt.t)
+	}
+}
+
+func BenchmarkLevenshteinDistanceBigEarly(b *testing.B) {
+	ldt := levenshteinDistanceTests[1]
+	for i := 0; i < b.N; i++ {
+		LevenshteinDistance(ldt.s, ldt.t)
 	}
 }

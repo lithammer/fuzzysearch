@@ -6,12 +6,32 @@ import (
 	"testing"
 )
 
+const deBelloGallico = `All Gaul is divided into three parts, one of which the Belgae inhabit,
+the Aquitani another, those who in their own language are called Celts, in our Gauls, the third. 
+All these differ from each other in language, customs and laws. The river Garonne separates the 
+Gauls from the Aquitani; the Marne and the Seine separate them from the Belgae. Of all these, 
+the Belgae are the bravest, because they are furthest from the civilization and refinement of 
+[our] Province, and merchants least frequently resort to them, and import those things which tend 
+to effeminate the mind; and they are the nearest to the Germans, who dwell beyond the Rhine, 
+with whom they are continually waging war; for which reason the Helvetii also surpass the rest 
+of the Gauls in valor, as they contend with the Germans in almost daily battles, when they either
+repel them from their own territories, or themselves wage war on their frontiers. One part of 
+these, which it has been said that the Gauls occupy, takes its beginning at the river Rhone;
+it is bounded by the river Garonne, the ocean, and the territories of the Belgae; it borders, 
+too, on the side of the Sequani and the Helvetii, upon the river Rhine, and stretches toward the
+north. The Belgae rises from the extreme frontier of Gaul, extend to the lower part of the river
+Rhine; and look toward the north and the rising sun. Aquitania extends from the river Garonne to
+the Pyrenaean mountains and to that part of the ocean which is near Spain: it looks between the
+setting of the sun, and the north star.`
+
 var fuzzyTests = []struct {
 	source string
 	target string
 	wanted bool
 	rank   int
 }{
+	{"zazz", fmt.Sprintf("%s zazz", deBelloGallico), true, 1553},
+	{"zazz", fmt.Sprintf("zazz %s", deBelloGallico), true, 1553},
 	{"twl", "cartwheel", true, 6},
 	{"cart", "cartwheel", true, 5},
 	{"cw", "cartwheel", true, 7},
@@ -95,14 +115,44 @@ func TestSortingRanks(t *testing.T) {
 }
 
 func BenchmarkMatch(b *testing.B) {
+	ft := fuzzyTests[2]
 	for i := 0; i < b.N; i++ {
-		Match("kitten", "sitting")
+		Match(ft.source, ft.target)
+	}
+}
+
+func BenchmarkMatchBigLate(b *testing.B) {
+	ft := fuzzyTests[0]
+	for i := 0; i < b.N; i++ {
+		Match(ft.source, ft.target)
+	}
+}
+
+func BenchmarkMatchBigEarly(b *testing.B) {
+	ft := fuzzyTests[1]
+	for i := 0; i < b.N; i++ {
+		Match(ft.source, ft.target)
 	}
 }
 
 func BenchmarkRankMatch(b *testing.B) {
+	ft := fuzzyTests[2]
 	for i := 0; i < b.N; i++ {
-		RankMatch("kitten", "sitting")
+		RankMatch(ft.source, ft.target)
+	}
+}
+
+func BenchmarkRankMatchBigLate(b *testing.B) {
+	ft := fuzzyTests[0]
+	for i := 0; i < b.N; i++ {
+		RankMatch(ft.source, ft.target)
+	}
+}
+
+func BenchmarkRankMatchBigEarly(b *testing.B) {
+	ft := fuzzyTests[1]
+	for i := 0; i < b.N; i++ {
+		RankMatch(ft.source, ft.target)
 	}
 }
 
