@@ -50,9 +50,9 @@ func Find(source string, targets []string) []string {
 // RankMatch is similar to Match except it will measure the Levenshtein
 // distance between the source and the target and return its result. If there
 // was no match, it will return -1.
-// Given the requirements of match, RankMatch only needs to perform a subset of the
-// Levenstein calculation, only deletions need be considered, required additions and
-// substitutions would fail the match test
+// Given the requirements of match, RankMatch only needs to perform a subset of
+// the Levenshtein calculation, only deletions need be considered, required
+// additions and substitutions would fail the match test.
 func RankMatch(source, target string) int {
 	lenDiff := len(target) - len(source)
 
@@ -79,7 +79,7 @@ Outer:
 		return -1
 	}
 
-	// count up remaining char
+	// Count up remaining char
 	for len(target) > 0 {
 		target = target[utf8.RuneLen(rune(target[0])):]
 		runeDiff++
