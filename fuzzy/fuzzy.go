@@ -2,7 +2,12 @@
 // useful for filtering data very quickly based on lightweight user input.
 package fuzzy
 
-import "unicode/utf8"
+import (
+	"unicode"
+	"unicode/utf8"
+)
+
+var noop = func(r rune) rune { return r }
 
 // Match returns true if source matches target using a fuzzy-searching
 // algorithm. Note that it doesn't implement Levenshtein distance (see
@@ -10,6 +15,15 @@ import "unicode/utf8"
 // approximation. The method will return true only if each character in the
 // source can be found in the target and occurs after the preceding matches.
 func Match(source, target string) bool {
+	return match(source, target, noop)
+}
+
+// MatchFold is a case-insensitive version of Match.
+func MatchFold(source, target string) bool {
+	return match(source, target, unicode.ToLower)
+}
+
+func match(source, target string, fn func(rune) rune) bool {
 	lenDiff := len(target) - len(source)
 
 	if lenDiff < 0 {
@@ -23,7 +37,7 @@ func Match(source, target string) bool {
 Outer:
 	for _, r1 := range source {
 		for i, r2 := range target {
-			if r1 == r2 {
+			if fn(r1) == fn(r2) {
 				target = target[i+utf8.RuneLen(r2):]
 				continue Outer
 			}
@@ -36,10 +50,19 @@ Outer:
 
 // Find will return a list of strings in targets that fuzzy matches source.
 func Find(source string, targets []string) []string {
+	return find(source, targets, noop)
+}
+
+// FindFold is a case-insensitive version of Find.
+func FindFold(source string, targets []string) []string {
+	return find(source, targets, unicode.ToLower)
+}
+
+func find(source string, targets []string, fn func(rune) rune) []string {
 	var matches []string
 
 	for _, target := range targets {
-		if Match(source, target) {
+		if match(source, target, fn) {
 			matches = append(matches, target)
 		}
 	}
@@ -54,6 +77,15 @@ func Find(source string, targets []string) []string {
 // the Levenshtein calculation, only deletions need be considered, required
 // additions and substitutions would fail the match test.
 func RankMatch(source, target string) int {
+	return rank(source, target, noop)
+}
+
+// RankMatchFold is a case-insensitive version of RankMatch.
+func RankMatchFold(source, target string) int {
+	return rank(source, target, unicode.ToLower)
+}
+
+func rank(source, target string, fn func(rune) rune) int {
 	lenDiff := len(target) - len(source)
 
 	if lenDiff < 0 {
@@ -69,7 +101,7 @@ func RankMatch(source, target string) int {
 Outer:
 	for _, r1 := range source {
 		for i, r2 := range target {
-			if r1 == r2 {
+			if fn(r1) == fn(r2) {
 				target = target[i+utf8.RuneLen(r2):]
 				continue Outer
 			} else {
@@ -92,12 +124,19 @@ Outer:
 // Levenshtein distance.
 func RankFind(source string, targets []string) ranks {
 	var r ranks
-	for _, target := range Find(source, targets) {
-		r = append(r, Rank{
-			Source:   source,
-			Target:   target,
-			Distance: LevenshteinDistance(source, target),
-		})
+	for _, target := range find(source, targets, noop) {
+		distance := LevenshteinDistance(source, target)
+		r = append(r, Rank{source, target, distance})
+	}
+	return r
+}
+
+// RankFindFold is a case-insensitive version of RankFind.
+func RankFindFold(source string, targets []string) ranks {
+	var r ranks
+	for _, target := range find(source, targets, unicode.ToLower) {
+		distance := LevenshteinDistance(source, target)
+		r = append(r, Rank{source, target, distance})
 	}
 	return r
 }
@@ -105,8 +144,10 @@ func RankFind(source string, targets []string) ranks {
 type Rank struct {
 	// Source is used as the source for matching.
 	Source string
+
 	// Target is the word matched against.
 	Target string
+
 	// Distance is the Levenshtein distance between Source and Target.
 	Distance int
 }

@@ -1,16 +1,13 @@
 package fuzzy
 
-import (
-	"fmt"
-	"testing"
-)
+import "testing"
 
 var levenshteinDistanceTests = []struct {
 	s, t   string
 	wanted int
 }{
-	{"zazz", fmt.Sprintf("%s zazz", deBelloGallico), 1553},
-	{"zazz", fmt.Sprintf("zazz %s", deBelloGallico), 1553},
+	{"zazz", deBelloGallico + " zazz", 1544},
+	{"zazz", "zazz " + deBelloGallico, 1544},
 	{"a", "a", 0},
 	{"ab", "ab", 0},
 	{"ab", "aa", 1},
@@ -28,7 +25,8 @@ func TestLevenshtein(t *testing.T) {
 	for _, test := range levenshteinDistanceTests {
 		distance := LevenshteinDistance(test.s, test.t)
 		if distance != test.wanted {
-			t.Errorf("got distance %d, expected %d for %s in %s", distance, test.wanted, test.s, test.t)
+			t.Errorf("got distance %d, expected %d for %s in %s",
+				distance, test.wanted, test.s, test.t)
 		}
 	}
 }
