@@ -114,8 +114,8 @@ func TestRankFind(t *testing.T) {
 }
 
 func TestSortingRanks(t *testing.T) {
-	rs := ranks{{"a", "b", 1}, {"a", "cc", 2}, {"a", "a", 0}}
-	wanted := ranks{rs[2], rs[0], rs[1]}
+	rs := Ranks{{"a", "b", 1}, {"a", "cc", 2}, {"a", "a", 0}}
+	wanted := Ranks{rs[2], rs[0], rs[1]}
 
 	sort.Sort(rs)
 
