@@ -96,8 +96,8 @@ func TestRankMatch(t *testing.T) {
 func TestRankFind(t *testing.T) {
 	target := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []Rank{
-		{"whl", "cartwheel", 6},
-		{"whl", "wheel", 2},
+		{"whl", "cartwheel", 6, 0},
+		{"whl", "wheel", 2, 2},
 	}
 
 	ranks := RankFind("whl", target)
@@ -114,7 +114,7 @@ func TestRankFind(t *testing.T) {
 }
 
 func TestSortingRanks(t *testing.T) {
-	rs := Ranks{{"a", "b", 1}, {"a", "cc", 2}, {"a", "a", 0}}
+	rs := Ranks{{"a", "b", 1, 0}, {"a", "cc", 2, 1}, {"a", "a", 0, 2}}
 	wanted := Ranks{rs[2], rs[0], rs[1]}
 
 	sort.Sort(rs)
@@ -206,5 +206,5 @@ func ExampleRankMatch() {
 
 func ExampleRankFind() {
 	fmt.Printf("%+v", RankFind("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
-	// Output: [{Source:whl Target:cartwheel Distance:6} {Source:whl Target:wheel Distance:2}]
+	// Output: [{Source:whl Target:cartwheel Distance:6 OriginalIndex:0} {Source:whl Target:wheel Distance:2 OriginalIndex:2}]
 }

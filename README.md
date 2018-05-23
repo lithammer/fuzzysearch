@@ -25,14 +25,14 @@ fuzzy.RankMatch("kitten", "sitting") // 3
 words := []string{"cartwheel", "foobar", "wheel", "baz"}
 fuzzy.Find("whl", words) // [cartwheel wheel]
 
-fuzzy.RankFind("whl", words) // [{whl cartwheel 6} {whl wheel 2}]
+fuzzy.RankFind("whl", words) // [{whl cartwheel 6 0} {whl wheel 2 2}]
 ```
 
 You can sort the result of a `fuzzy.RankFind()` call using the [`sort`](https://golang.org/pkg/sort/) package in the standard library:
 
 ```go
-matches := fuzzy.RankFind("whl", words) // [{whl cartwheel 6} {whl wheel 2}]
-sort.Sort(matches) // [{whl wheel 2} {whl cartwheel 6}]
+matches := fuzzy.RankFind("whl", words) // [{whl cartwheel 6 0} {whl wheel 2 2}]
+sort.Sort(matches) // [{whl wheel 2 2} {whl cartwheel 6 0}]
 ```
 
 ## License
