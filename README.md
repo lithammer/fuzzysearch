@@ -1,9 +1,9 @@
 # Fuzzy Search
 
-[![Build Status](https://img.shields.io/travis/renstrom/fuzzysearch.svg?style=flat-square)](https://travis-ci.org/renstrom/fuzzysearch)
-[![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy)
+[![Build Status](https://img.shields.io/travis/lithammer/fuzzysearch.svg?style=flat-square)](https://travis-ci.org/lithammer/fuzzysearch)
+[![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/lithammer/fuzzysearch/fuzzy)
 
-Inspired by _[bevacqua/fuzzysearch][1]_, a fuzzy matching library written in JavaScript. But contains some extras like ranking using _[Levenshtein distance][2]_ (see [`RankMatch()`](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy#RankMatch)) and finding matches in a list of words (see [`Find()`](https://godoc.org/github.com/renstrom/fuzzysearch/fuzzy#Find)).
+Inspired by _[bevacqua/fuzzysearch][1]_, a fuzzy matching library written in JavaScript. But contains some extras like ranking using _[Levenshtein distance][2]_ (see [`RankMatch()`](https://godoc.org/github.com/lithammer/fuzzysearch/fuzzy#RankMatch)) and finding matches in a list of words (see [`Find()`](https://godoc.org/github.com/lithammer/fuzzysearch/fuzzy#Find)).
 
 Fuzzy searching allows for flexibly matching a string with partial input, useful for filtering data very quickly based on lightweight user input.
 
