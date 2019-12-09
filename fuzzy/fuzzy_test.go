@@ -45,6 +45,7 @@ var fuzzyTests = []struct {
 	{"中国", "中华人民共和国", true, 5},
 	{"日本", "中华人民共和国", false, -1},
 	{"イ", "イカ", true, 1},
+	{"limón", "limon", false, -1},
 }
 
 func TestFuzzyMatch(t *testing.T) {
@@ -67,11 +68,87 @@ func TestFuzzyMatchFold(t *testing.T) {
 	}
 }
 
+func TestFuzzyMatchNormalized(t *testing.T) {
+	var normalizedTests = []struct {
+		source string
+		target string
+		wanted bool
+	}{
+		{"limon", "limón", true},
+		{"limón", "limon tart", true},
+		{"limón", "LiMóN tArT", false},
+		{"limón", "LeMoN tArT", false},
+	}
+
+	for _, val := range normalizedTests {
+		match := MatchNormalized(val.source, val.target)
+		if match != val.wanted {
+			t.Errorf("%s in %s expected match to be %t, got %t",
+				val.source, val.target, val.wanted, match)
+		}
+	}
+}
+
+func TestFuzzyMatchNormalizedFold(t *testing.T) {
+	var normalizedTests = []struct {
+		source string
+		target string
+		wanted bool
+	}{
+		{"limon", "limón", true},
+		{"limón", "limon tart", true},
+		{"limón", "LiMóN tArT", true},
+		{"limón", "LeMoN tArT", false},
+	}
+
+	for _, val := range normalizedTests {
+		match := MatchNormalizedFold(val.source, val.target)
+		if match != val.wanted {
+			t.Errorf("%s in %s expected match to be %t, got %t",
+				val.source, val.target, val.wanted, match)
+		}
+	}
+}
+
 func TestFuzzyFind(t *testing.T) {
-	target := []string{"cartwheel", "foobar", "wheel", "baz"}
+	target := []string{"cartwheel", "foobar", "wheel", "baz", "cartwhéél"}
 	wanted := []string{"cartwheel", "wheel"}
 
-	matches := Find("whl", target)
+	matches := Find("whel", target)
+
+	if len(matches) != len(wanted) {
+		t.Errorf("expected %s, got %s", wanted, matches)
+	}
+
+	for i := range wanted {
+		if wanted[i] != matches[i] {
+			t.Errorf("expected %s, got %s", wanted, matches)
+		}
+	}
+}
+
+func TestFuzzyFindNormalized(t *testing.T) {
+	target := []string{"cartwheel", "foobar", "wheel", "baz", "cartwhéél", "WHEEL"}
+	wanted := []string{"cartwheel", "wheel", "cartwhéél"}
+
+	matches := FindNormalized("whél", target)
+
+	if len(matches) != len(wanted) {
+		t.Errorf("expected %s, got %s", wanted, matches)
+	}
+
+	for i := range wanted {
+		if wanted[i] != matches[i] {
+			t.Errorf("expected %s, got %s", wanted, matches)
+		}
+	}
+}
+
+func TestFuzzyFindNormalizedFold(t *testing.T) {
+	target := []string{"cartwheel", "foobar", "wheel", "baz", "cartwhéél", "WHEEL"}
+	wanted := []string{"cartwheel", "wheel", "cartwhéél", "WHEEL"}
+
+	matches := FindNormalizedFold("whél", target)
 
 	if len(matches) != len(wanted) {
 		t.Errorf("expected %s, got %s", wanted, matches)
@@ -94,6 +171,47 @@ func TestRankMatch(t *testing.T) {
 	}
 }
 
+func TestRankMatchNormalized(t *testing.T) {
+	var fuzzyTests = []struct {
+		source string
+		target string
+		rank   int
+	}{
+		{"limó", "limon", 1},
+		{"limó", "limon", 1},
+		{"limó", "LIMON", -1},
+	}
+
+	for _, val := range fuzzyTests {
+		rank := RankMatchNormalized(val.source, val.target)
+		if rank != val.rank {
+			t.Errorf("expected ranking %d, got %d for %s in %s",
+				val.rank, rank, val.source, val.target)
+		}
+	}
+}
+
+func TestRankMatchNormalizedFold(t *testing.T) {
+	var fuzzyTests = []struct {
+		source string
+		target string
+		rank   int
+	}{
+		{"limó", "limon", 1},
+		{"limó", "limon", 1},
+		{"limó", "LIMON", 1},
+		{"limó", "LIMON TART", 6},
+	}
+
+	for _, val := range fuzzyTests {
+		rank := RankMatchNormalizedFold(val.source, val.target)
+		if rank != val.rank {
+			t.Errorf("expected ranking %d, got %d for %s in %s",
+				val.rank, rank, val.source, val.target)
+		}
+	}
+}
+
 func TestRankFind(t *testing.T) {
 	target := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []Rank{
@@ -102,6 +220,47 @@ func TestRankFind(t *testing.T) {
 	}
 
 	ranks := RankFind("whl", target)
+
+	if len(ranks) != len(wanted) {
+		t.Errorf("expected %+v, got %+v", wanted, ranks)
+	}
+
+	for i := range wanted {
+		if wanted[i] != ranks[i] {
+			t.Errorf("expected %+v, got %+v", wanted, ranks)
+		}
+	}
+}
+
+func TestRankFindNormalized(t *testing.T) {
+	target := []string{"limón", "limon", "lemon", "LIMON"}
+	wanted := []Rank{
+		{"limó", "limón", 1, 0},
+		{"limó", "limon", 2, 1},
+	}
+
+	ranks := RankFindNormalized("limó", target)
+
+	if len(ranks) != len(wanted) {
+		t.Errorf("expected %+v, got %+v", wanted, ranks)
+	}
+
+	for i := range wanted {
+		if wanted[i] != ranks[i] {
+			t.Errorf("expected %+v, got %+v", wanted, ranks)
+		}
+	}
+}
+
+func TestRankFindNormalizedFold(t *testing.T) {
+	target := []string{"limón", "limon", "lemon", "LIMON"}
+	wanted := []Rank{
+		{"limó", "limón", 1, 0},
+		{"limó", "limon", 2, 1},
+		{"limó", "LIMON", 5, 3},
+	}
+
+	ranks := RankFindNormalizedFold("limó", target)
 
 	if len(ranks) != len(wanted) {
 		t.Errorf("expected %+v, got %+v", wanted, ranks)
