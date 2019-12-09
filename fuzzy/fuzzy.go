@@ -172,7 +172,7 @@ func RankFindFold(source string, targets []string) Ranks {
 	return rankFind(source, targets, foldTransformer)
 }
 
-// RankFindNormalized is a unicode-normalizedversion of RankFind.
+// RankFindNormalized is a unicode-normalized version of RankFind.
 func RankFindNormalized(source string, targets []string) Ranks {
 	return rankFind(source, targets, normalizeTransformer)
 }
