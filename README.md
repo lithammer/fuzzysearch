@@ -26,6 +26,10 @@ words := []string{"cartwheel", "foobar", "wheel", "baz"}
 fuzzy.Find("whl", words) // [cartwheel wheel]
 
 fuzzy.RankFind("whl", words) // [{whl cartwheel 6 0} {whl wheel 2 2}]
+
+
+// Unicode normalized matching.
+fuzzy.MatchNormalized("cartwheel", "cartwhéél") // true
 ```
 
 You can sort the result of a `fuzzy.RankFind()` call using the [`sort`](https://golang.org/pkg/sort/) package in the standard library:
