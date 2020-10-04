@@ -212,6 +212,28 @@ func TestRankMatchNormalizedFold(t *testing.T) {
 	}
 }
 
+func TestRankMatchNormalizedFoldConcurrent(t *testing.T) {
+	target := strings.Split("Lorem ipsum dolor sit amet, consectetur adipiscing elit", " ")
+	source := "ips"
+	procs := 10
+	iter := 10
+	type empty struct{}
+	done := make(chan empty)
+	for i := 0; i <= procs; i++ {
+		go func() {
+			for n := 0; n < iter; n++ {
+				_ = RankFindNormalizedFold(source, target)
+			}
+			done <- empty{}
+		}()
+	}
+	cnt := 0;
+	for i := 0; i < procs; i++ {
+		<- done
+		cnt++
+	}
+}
+
 func TestRankFind(t *testing.T) {
 	target := []string{"cartwheel", "foobar", "wheel", "baz"}
 	wanted := []Rank{
