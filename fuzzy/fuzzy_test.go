@@ -227,9 +227,9 @@ func TestRankMatchNormalizedFoldConcurrent(t *testing.T) {
 			done <- empty{}
 		}()
 	}
-	cnt := 0;
+	cnt := 0
 	for i := 0; i < procs; i++ {
-		<- done
+		<-done
 		cnt++
 	}
 }
