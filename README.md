@@ -19,8 +19,10 @@ fuzzy.Match("ee", "cartwheel")   // true
 fuzzy.Match("art", "cartwheel")  // true
 fuzzy.Match("eeel", "cartwheel") // false
 fuzzy.Match("dog", "cartwheel")  // false
+fuzzy.Match("kitten", "sitting") // false
 
-fuzzy.RankMatch("kitten", "sitting") // 3
+fuzzy.RankMatch("kitten", "sitting") // -1
+fuzzy.RankMatch("cart", "cartwheel") // 5
 
 words := []string{"cartwheel", "foobar", "wheel", "baz"}
 fuzzy.Find("whl", words) // [cartwheel wheel]

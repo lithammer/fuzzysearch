@@ -46,6 +46,7 @@ var fuzzyTests = []struct {
 	{"日本", "中华人民共和国", false, -1},
 	{"イ", "イカ", true, 1},
 	{"limón", "limon", false, -1},
+	{"kitten", "setting", false, -1},
 }
 
 func TestFuzzyMatch(t *testing.T) {
