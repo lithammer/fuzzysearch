@@ -28,7 +28,6 @@ func normalizedFoldTransformer() transform.Transformer {
 	return transform.Chain(normalizeTransformer(), foldTransformer())
 }
 
-
 // Match returns true if source matches target using a fuzzy-searching
 // algorithm. Note that it doesn't implement Levenshtein distance (see
 // RankMatch instead), but rather a simplified version where there's no
