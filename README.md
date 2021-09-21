@@ -9,29 +9,40 @@ Fuzzy searching allows for flexibly matching a string with partial input, useful
 
 The current implementation uses the algorithm suggested by Mr. Aleph, a russian compiler engineer working at V8.
 
+## Install
+
+```
+go get github.com/lithammer/fuzzysearch/fuzzy
+```
+
 ## Usage
 
 ```go
-fuzzy.Match("twl", "cartwheel")  // true
-fuzzy.Match("cart", "cartwheel") // true
-fuzzy.Match("cw", "cartwheel")   // true
-fuzzy.Match("ee", "cartwheel")   // true
-fuzzy.Match("art", "cartwheel")  // true
-fuzzy.Match("eeel", "cartwheel") // false
-fuzzy.Match("dog", "cartwheel")  // false
-fuzzy.Match("kitten", "sitting") // false
+package main
 
-fuzzy.RankMatch("kitten", "sitting") // -1
-fuzzy.RankMatch("cart", "cartwheel") // 5
+import "github.com/lithammer/fuzzysearch/fuzzy"
 
-words := []string{"cartwheel", "foobar", "wheel", "baz"}
-fuzzy.Find("whl", words) // [cartwheel wheel]
-
-fuzzy.RankFind("whl", words) // [{whl cartwheel 6 0} {whl wheel 2 2}]
-
-
-// Unicode normalized matching.
-fuzzy.MatchNormalized("cartwheel", "cartwhéél") // true
+func main() {
+	fuzzy.Match("twl", "cartwheel")  // true
+	fuzzy.Match("cart", "cartwheel") // true
+	fuzzy.Match("cw", "cartwheel")   // true
+	fuzzy.Match("ee", "cartwheel")   // true
+	fuzzy.Match("art", "cartwheel")  // true
+	fuzzy.Match("eeel", "cartwheel") // false
+	fuzzy.Match("dog", "cartwheel")  // false
+	fuzzy.Match("kitten", "sitting") // false
+	
+	fuzzy.RankMatch("kitten", "sitting") // -1
+	fuzzy.RankMatch("cart", "cartwheel") // 5
+	
+	words := []string{"cartwheel", "foobar", "wheel", "baz"}
+	fuzzy.Find("whl", words) // [cartwheel wheel]
+	
+	fuzzy.RankFind("whl", words) // [{whl cartwheel 6 0} {whl wheel 2 2}]
+	
+	// Unicode normalized matching.
+	fuzzy.MatchNormalized("cartwheel", "cartwhéél") // true
+}
 ```
 
 You can sort the result of a `fuzzy.RankFind()` call using the [`sort`](https://golang.org/pkg/sort/) package in the standard library:
