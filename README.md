@@ -1,13 +1,14 @@
 # Fuzzy Search
 
-[![Build Status](https://github.com/lithammer/fuzzysearch/workflows/Go/badge.svg)](https://github.com/lithammer/fuzzysearch/actions)
-[![Godoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat-square)](https://godoc.org/github.com/lithammer/fuzzysearch/fuzzy)
+Inspired by _[bevacqua/fuzzysearch][1]_, a fuzzy matching library written in
+JavaScript. But contains some extras like ranking using _[Levenshtein
+distance][2]_ and finding matches in a list of words.
 
-Inspired by _[bevacqua/fuzzysearch][1]_, a fuzzy matching library written in JavaScript. But contains some extras like ranking using _[Levenshtein distance][2]_ (see [`RankMatch()`](https://godoc.org/github.com/lithammer/fuzzysearch/fuzzy#RankMatch)) and finding matches in a list of words (see [`Find()`](https://godoc.org/github.com/lithammer/fuzzysearch/fuzzy#Find)).
+Fuzzy searching allows for flexibly matching a string with partial input,
+useful for filtering data very quickly based on lightweight user input.
 
-Fuzzy searching allows for flexibly matching a string with partial input, useful for filtering data very quickly based on lightweight user input.
-
-The current implementation uses the algorithm suggested by Mr. Aleph, a russian compiler engineer working at V8.
+The current implementation uses the algorithm suggested by Mr. Aleph, a russian
+compiler engineer working at V8.
 
 ## Install
 
@@ -45,7 +46,8 @@ func main() {
 }
 ```
 
-You can sort the result of a `fuzzy.RankFind()` call using the [`sort`](https://golang.org/pkg/sort/) package in the standard library:
+You can sort the result of a `fuzzy.RankFind()` call using the [`sort`][3]
+package in the standard library:
 
 ```go
 matches := fuzzy.RankFind("whl", words) // [{whl cartwheel 6 0} {whl wheel 2 2}]
@@ -58,3 +60,4 @@ MIT
 
 [1]: https://github.com/bevacqua/fuzzysearch
 [2]: http://en.wikipedia.org/wiki/Levenshtein_distance
+[3]: https://golang.org/pkg/sort/
