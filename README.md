@@ -54,6 +54,8 @@ matches := fuzzy.RankFind("whl", words) // [{whl cartwheel 6 0} {whl wheel 2 2}]
 sort.Sort(matches) // [{whl wheel 2 2} {whl cartwheel 6 0}]
 ```
 
+See the [`fuzzy`][4] package documentation for more examples.
+
 ## License
 
 MIT
@@ -61,3 +63,4 @@ MIT
 [1]: https://github.com/bevacqua/fuzzysearch
 [2]: http://en.wikipedia.org/wiki/Levenshtein_distance
 [3]: https://golang.org/pkg/sort/
+[4]: https://pkg.go.dev/github.com/lithammer/fuzzysearch/fuzzy
