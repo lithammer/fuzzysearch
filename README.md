@@ -1,8 +1,8 @@
 # Fuzzy Search
 
-Inspired by _[bevacqua/fuzzysearch][1]_, a fuzzy matching library written in
-JavaScript. But contains some extras like ranking using _[Levenshtein
-distance][2]_ and finding matches in a list of words.
+Inspired by [bevacqua/fuzzysearch][1], a fuzzy matching library written in
+JavaScript. But contains some extras like ranking using [Levenshtein
+distance][2] and finding matches in a list of words.
 
 Fuzzy searching allows for flexibly matching a string with partial input,
 useful for filtering data very quickly based on lightweight user input.
