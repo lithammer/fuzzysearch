@@ -43,6 +43,9 @@ func main() {
 	
 	// Unicode normalized matching.
 	fuzzy.MatchNormalized("cartwheel", "cartwhéél") // true
+
+	// Case insensitive matching.
+	fuzzy.MatchFold("ArTeeL", "cartwheel") // true
 }
 ```
 
