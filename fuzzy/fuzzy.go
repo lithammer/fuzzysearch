@@ -248,7 +248,7 @@ func stringTransform(s string, t transform.Transformer) (transformed string) {
 	return
 }
 
-type unicodeFoldTransformer struct{}
+type unicodeFoldTransformer struct{ transform.NopResetter }
 
 func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
 	runes := bytes.Runes(src)
@@ -265,8 +265,6 @@ func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc
 
 	return n, n, err
 }
-
-func (unicodeFoldTransformer) Reset() {}
 
 type nopTransformer struct{ transform.NopResetter }
 
