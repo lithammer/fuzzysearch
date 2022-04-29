@@ -13,7 +13,7 @@ import (
 )
 
 func noopTransformer() transform.Transformer {
-	return transform.Nop
+	return nopTransformer{}
 }
 
 func foldTransformer() transform.Transformer {
@@ -234,6 +234,11 @@ func (r Ranks) Less(i, j int) bool {
 }
 
 func stringTransform(s string, t transform.Transformer) (transformed string) {
+	// Fast path for the nop transformer to prevent unnecessary allocations.
+	if _, ok := t.(nopTransformer); ok {
+		return s
+	}
+
 	var err error
 	transformed, _, err = transform.String(t, s)
 	if err != nil {
@@ -262,3 +267,9 @@ func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc
 }
 
 func (unicodeFoldTransformer) Reset() {}
+
+type nopTransformer struct{ transform.NopResetter }
+
+func (nopTransformer) Transform(dst []byte, src []byte, atEOF bool) (int, int, error) {
+	return 0, len(src), nil
+}
