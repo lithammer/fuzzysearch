@@ -11,7 +11,6 @@ var levenshteinDistanceTests = []struct {
 	{"a", "a", 0},
 	{"ab", "ab", 0},
 	{"ab", "aa", 1},
-	{"ab", "aa", 1},
 	{"ab", "aaa", 2},
 	{"bbb", "a", 3},
 	{"kitten", "sitting", 3},
