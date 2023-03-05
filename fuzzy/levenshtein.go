@@ -1,5 +1,7 @@
 package fuzzy
 
+import "fmt"
+
 // LevenshteinDistance measures the difference between two strings.
 // The Levenshtein distance between two words is the minimum number of
 // single-character edits (i.e. insertions, deletions or substitutions)
@@ -32,7 +34,9 @@ func LevenshteinDistance(s, t string) int {
 
 	return column[len(r1)]
 }
-
+func LevenshteinDistanceStringer(s, t fmt.Stringer) int {
+	return LevenshteinDistance(s.String(), t.String())
+}
 func min(a, b, c int) int {
 	if a < b && a < c {
 		return a
