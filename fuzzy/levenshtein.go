@@ -33,11 +33,13 @@ func LevenshteinDistance(s, t string) int {
 	return column[len(r1)]
 }
 
-func min(a, b, c int) int {
-	if a < b && a < c {
+func min2(a, b int) int {
+	if a < b {
 		return a
-	} else if b < c {
-		return b
 	}
-	return c
+	return b
+}
+
+func min(a, b, c int) int {
+	return min2(min2(a, b), c)
 }
