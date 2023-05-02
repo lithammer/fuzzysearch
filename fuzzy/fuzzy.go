@@ -3,7 +3,6 @@
 package fuzzy
 
 import (
-	"bytes"
 	"unicode"
 	"unicode/utf8"
 
@@ -251,18 +250,21 @@ func stringTransform(s string, t transform.Transformer) (transformed string) {
 type unicodeFoldTransformer struct{ transform.NopResetter }
 
 func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
-	runes := bytes.Runes(src)
-	var lowerRunes []rune
-	for _, r := range runes {
-		lowerRunes = append(lowerRunes, unicode.ToLower(r))
+	n := 0
+	// Converting src to a string allocates.
+	// In theory, it need not; see https://go.dev/issue/27148.
+	// It is possible to write this loop using utf8.DecodeRune
+	// and thereby avoid allocations, but it is noticeably slower.
+	// So just let's wait for the compiler to get smarter.
+	for _, r := range string(src) {
+		r = unicode.ToLower(r)
+		x := utf8.RuneLen(r)
+		if x > len(dst[n:]) {
+			err = transform.ErrShortDst
+			break
+		}
+		n += utf8.EncodeRune(dst[n:], r)
 	}
-
-	srcBytes := []byte(string(lowerRunes))
-	n := copy(dst, srcBytes)
-	if n < len(srcBytes) {
-		err = transform.ErrShortDst
-	}
-
 	return n, n, err
 }
 
