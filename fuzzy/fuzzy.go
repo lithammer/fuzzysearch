@@ -250,22 +250,30 @@ func stringTransform(s string, t transform.Transformer) (transformed string) {
 type unicodeFoldTransformer struct{ transform.NopResetter }
 
 func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
-	n := 0
 	// Converting src to a string allocates.
 	// In theory, it need not; see https://go.dev/issue/27148.
 	// It is possible to write this loop using utf8.DecodeRune
 	// and thereby avoid allocations, but it is noticeably slower.
 	// So just let's wait for the compiler to get smarter.
 	for _, r := range string(src) {
+		if r == utf8.RuneError {
+			// Go spec for ranging over a string says:
+			// If the iteration encounters an invalid UTF-8 sequence,
+			// the second value will be 0xFFFD, the Unicode replacement character,
+			// and the next iteration will advance a single byte in the string.
+			nSrc++
+		} else {
+			nSrc += utf8.RuneLen(r)
+		}
 		r = unicode.ToLower(r)
 		x := utf8.RuneLen(r)
-		if x > len(dst[n:]) {
+		if x > len(dst[nDst:]) {
 			err = transform.ErrShortDst
 			break
 		}
-		n += utf8.EncodeRune(dst[n:], r)
+		nDst += utf8.EncodeRune(dst[nDst:], r)
 	}
-	return n, n, err
+	return nDst, nSrc, err
 }
 
 type nopTransformer struct{ transform.NopResetter }
