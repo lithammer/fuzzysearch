@@ -47,6 +47,8 @@ var fuzzyTests = []struct {
 	{"イ", "イカ", true, 1},
 	{"limón", "limon", false, -1},
 	{"kitten", "setting", false, -1},
+	{"\xffinvalid UTF-8\xff", "", false, -1}, // invalid UTF-8
+	{"Ⱦ", "", false, -1},                     // uppercase and lowercase runes have different UTF-8 encoding lengths
 }
 
 func TestFuzzyMatch(t *testing.T) {
