@@ -52,9 +52,12 @@ func MatchNormalizedFold(source, target string) bool {
 }
 
 func match(source, target string, transformer transform.Transformer) bool {
-	source = stringTransform(source, transformer)
-	target = stringTransform(target, transformer)
+	sourceT := stringTransform(source, transformer)
+	targetT := stringTransform(target, transformer)
+	return matchTransformed(sourceT, targetT)
+}
 
+func matchTransformed(source, target string) bool {
 	lenDiff := len(target) - len(source)
 
 	if lenDiff < 0 {
@@ -100,10 +103,13 @@ func FindNormalizedFold(source string, targets []string) []string {
 }
 
 func find(source string, targets []string, transformer transform.Transformer) []string {
+	sourceT := stringTransform(source, transformer)
+
 	var matches []string
 
 	for _, target := range targets {
-		if match(source, target, transformer) {
+		targetT := stringTransform(target, transformer)
+		if matchTransformed(sourceT, targetT) {
 			matches = append(matches, target)
 		}
 	}
@@ -193,10 +199,13 @@ func RankFindNormalizedFold(source string, targets []string) Ranks {
 }
 
 func rankFind(source string, targets []string, transformer transform.Transformer) Ranks {
+	sourceT := stringTransform(source, transformer)
+
 	var r Ranks
 
 	for index, target := range targets {
-		if match(source, target, transformer) {
+		targetT := stringTransform(target, transformer)
+		if matchTransformed(sourceT, targetT) {
 			distance := LevenshteinDistance(source, target)
 			r = append(r, Rank{source, target, distance, index})
 		}

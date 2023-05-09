@@ -25,12 +25,14 @@ Rhine; and look toward the north and the rising sun. Aquitania extends from the 
 the Pyrenaean mountains and to that part of the ocean which is near Spain: it looks between the
 setting of the sun, and the north star.`
 
-var fuzzyTests = []struct {
+type fuzzyTest struct {
 	source string
 	target string
 	wanted bool
 	rank   int
-}{
+}
+
+var fuzzyTests = []fuzzyTest{
 	{"zazz", deBelloGallico + " zazz", true, 1544},
 	{"zazz", "zazz " + deBelloGallico, true, 1544},
 	{"twl", "cartwheel", true, 6},
@@ -350,6 +352,24 @@ func BenchmarkMatchFoldBigEarly(b *testing.B) {
 	ft := fuzzyTests[1]
 	for i := 0; i < b.N; i++ {
 		MatchFold(ft.source, ft.target)
+	}
+}
+
+func BenchmarkFindFold(b *testing.B) {
+	b.Run("Plain", func(b *testing.B) { benchmarkFindFold(b, fuzzyTests[2]) })
+	b.Run("BigLate", func(b *testing.B) { benchmarkFindFold(b, fuzzyTests[0]) })
+	b.Run("BigEarly", func(b *testing.B) { benchmarkFindFold(b, fuzzyTests[1]) })
+}
+
+func benchmarkFindFold(b *testing.B, ft fuzzyTest) {
+	src := ft.source
+	var tgts []string
+	for i := 0; i < 128; i++ {
+		tgts = append(tgts, ft.target)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		FindFold(src, tgts)
 	}
 }
 
