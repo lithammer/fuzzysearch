@@ -3,7 +3,6 @@
 package fuzzy
 
 import (
-	"bytes"
 	"unicode"
 	"unicode/utf8"
 
@@ -53,9 +52,12 @@ func MatchNormalizedFold(source, target string) bool {
 }
 
 func match(source, target string, transformer transform.Transformer) bool {
-	source = stringTransform(source, transformer)
-	target = stringTransform(target, transformer)
+	sourceT := stringTransform(source, transformer)
+	targetT := stringTransform(target, transformer)
+	return matchTransformed(sourceT, targetT)
+}
 
+func matchTransformed(source, target string) bool {
 	lenDiff := len(target) - len(source)
 
 	if lenDiff < 0 {
@@ -101,10 +103,13 @@ func FindNormalizedFold(source string, targets []string) []string {
 }
 
 func find(source string, targets []string, transformer transform.Transformer) []string {
+	sourceT := stringTransform(source, transformer)
+
 	var matches []string
 
 	for _, target := range targets {
-		if match(source, target, transformer) {
+		targetT := stringTransform(target, transformer)
+		if matchTransformed(sourceT, targetT) {
 			matches = append(matches, target)
 		}
 	}
@@ -194,10 +199,13 @@ func RankFindNormalizedFold(source string, targets []string) Ranks {
 }
 
 func rankFind(source string, targets []string, transformer transform.Transformer) Ranks {
+	sourceT := stringTransform(source, transformer)
+
 	var r Ranks
 
 	for index, target := range targets {
-		if match(source, target, transformer) {
+		targetT := stringTransform(target, transformer)
+		if matchTransformed(sourceT, targetT) {
 			distance := LevenshteinDistance(source, target)
 			r = append(r, Rank{source, target, distance, index})
 		}
@@ -251,19 +259,30 @@ func stringTransform(s string, t transform.Transformer) (transformed string) {
 type unicodeFoldTransformer struct{ transform.NopResetter }
 
 func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc int, err error) {
-	runes := bytes.Runes(src)
-	var lowerRunes []rune
-	for _, r := range runes {
-		lowerRunes = append(lowerRunes, unicode.ToLower(r))
+	// Converting src to a string allocates.
+	// In theory, it need not; see https://go.dev/issue/27148.
+	// It is possible to write this loop using utf8.DecodeRune
+	// and thereby avoid allocations, but it is noticeably slower.
+	// So just let's wait for the compiler to get smarter.
+	for _, r := range string(src) {
+		if r == utf8.RuneError {
+			// Go spec for ranging over a string says:
+			// If the iteration encounters an invalid UTF-8 sequence,
+			// the second value will be 0xFFFD, the Unicode replacement character,
+			// and the next iteration will advance a single byte in the string.
+			nSrc++
+		} else {
+			nSrc += utf8.RuneLen(r)
+		}
+		r = unicode.ToLower(r)
+		x := utf8.RuneLen(r)
+		if x > len(dst[nDst:]) {
+			err = transform.ErrShortDst
+			break
+		}
+		nDst += utf8.EncodeRune(dst[nDst:], r)
 	}
-
-	srcBytes := []byte(string(lowerRunes))
-	n := copy(dst, srcBytes)
-	if n < len(srcBytes) {
-		err = transform.ErrShortDst
-	}
-
-	return n, n, err
+	return nDst, nSrc, err
 }
 
 type nopTransformer struct{ transform.NopResetter }
