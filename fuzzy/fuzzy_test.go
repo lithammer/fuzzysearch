@@ -436,3 +436,160 @@ func TestRankMatchTransformedLength(t *testing.T) {
 		})
 	}
 }
+
+func TestRankDistance(t *testing.T) {
+	for _, val := range fuzzyTests {
+		distance := RankDistance(val.source, val.target)
+		expected := val.rank
+		if !val.wanted {
+			expected = MaxDistance
+		}
+		if distance != expected {
+			t.Errorf("expected ranking distance %d, got %d for %s in %s",
+				expected, distance, val.source, val.target)
+		}
+	}
+}
+
+func TestRankDistanceFold(t *testing.T) {
+	tests := []struct {
+		source string
+		target string
+		dist   int
+	}{
+		{"twl", "CARTWHEEL", 6},
+		{"cart", "CartWheel", 5},
+		{"cw", "CARTWHEEL", 7},
+		{"ee", "CARTWHEEL", 7},
+		{"art", "CARTWHEEL", 6},
+		{"eeel", "CARTWHEEL", MaxDistance},
+		{"dog", "CARTWHEEL", MaxDistance},
+		{"kitten", "SITTING", MaxDistance},
+	}
+
+	for _, val := range tests {
+		dist := RankDistanceFold(val.source, val.target)
+		if dist != val.dist {
+			t.Errorf("expected ranking distance %d, got %d for %s in %s",
+				val.dist, dist, val.source, val.target)
+		}
+	}
+
+	for _, val := range fuzzyTests {
+		matchRank := RankMatchFold(val.source, strings.ToUpper(val.target))
+		expected := matchRank
+		if expected < 0 {
+			expected = MaxDistance
+		}
+		dist := RankDistanceFold(val.source, strings.ToUpper(val.target))
+		if dist != expected {
+			t.Errorf("expected ranking distance %d, got %d for %s in %s",
+				expected, dist, val.source, strings.ToUpper(val.target))
+		}
+	}
+}
+
+func TestRankDistanceNormalized(t *testing.T) {
+	tests := []struct {
+		source string
+		target string
+		dist   int
+	}{
+		{"limó", "limon", 1},
+		{"limó", "LIMON", MaxDistance},
+	}
+
+	for _, val := range tests {
+		dist := RankDistanceNormalized(val.source, val.target)
+		if dist != val.dist {
+			t.Errorf("expected ranking distance %d, got %d for %s in %s",
+				val.dist, dist, val.source, val.target)
+		}
+	}
+}
+
+func TestRankDistanceNormalizedFold(t *testing.T) {
+	tests := []struct {
+		source string
+		target string
+		dist   int
+	}{
+		{"limó", "limon", 1},
+		{"limó", "LIMON", 1},
+		{"limó", "LIMON TART", 6},
+		{"kitten", "sitting", MaxDistance},
+	}
+
+	for _, val := range tests {
+		dist := RankDistanceNormalizedFold(val.source, val.target)
+		if dist != val.dist {
+			t.Errorf("expected ranking distance %d, got %d for %s in %s",
+				val.dist, dist, val.source, val.target)
+		}
+	}
+}
+
+func TestRankDistanceComparisonSafety(t *testing.T) {
+	target := "hello world"
+	noMatch := "foo"
+	farMatch := "Hello"
+	closeMatch := "Hello Wor"
+
+	dNoMatch := RankDistanceNormalizedFold(noMatch, target)
+	dFar := RankDistanceNormalizedFold(farMatch, target)
+	dClose := RankDistanceNormalizedFold(closeMatch, target)
+
+	if dNoMatch != MaxDistance {
+		t.Fatalf("expected non-match distance %d, got %d", MaxDistance, dNoMatch)
+	}
+	if dFar != 6 {
+		t.Fatalf("expected far match distance 6, got %d", dFar)
+	}
+	if dClose != 2 {
+		t.Fatalf("expected close match distance 2, got %d", dClose)
+	}
+
+	if min2(dNoMatch, dFar) != dFar {
+		t.Errorf("expected matching candidate (%d) to win over non-match (%d)", dFar, dNoMatch)
+	}
+	if min2(dFar, dClose) != dClose {
+		t.Errorf("expected closer match (%d) to win over far match (%d)", dClose, dFar)
+	}
+
+	candidates := []string{noMatch, farMatch, closeMatch, "other non-match"}
+	bestIdx := -1
+	bestDist := MaxDistance
+	for i, cand := range candidates {
+		dist := RankDistanceNormalizedFold(cand, target)
+		if dist < bestDist {
+			bestDist = dist
+			bestIdx = i
+		}
+	}
+
+	if bestIdx != 2 || bestDist != 2 {
+		t.Errorf("expected best match index 2 with distance 2, got index %d with distance %d", bestIdx, bestDist)
+	}
+}
+
+func BenchmarkRankDistance(b *testing.B) {
+	ft := fuzzyTests[2]
+	for b.Loop() {
+		RankDistance(ft.source, ft.target)
+	}
+}
+
+func BenchmarkRankDistanceFold(b *testing.B) {
+	ft := fuzzyTests[2]
+	for b.Loop() {
+		RankDistanceFold(ft.source, ft.target)
+	}
+}
+
+func ExampleRankDistance() {
+	fmt.Println(RankDistance("twl", "cartwheel"))
+	fmt.Println(RankDistance("dog", "cartwheel") == MaxDistance)
+	// Output:
+	// 6
+	// true
+}
