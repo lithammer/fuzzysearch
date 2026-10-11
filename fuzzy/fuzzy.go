@@ -143,14 +143,14 @@ func RankMatchNormalizedFold(source, target string) int {
 }
 
 func rank(source, target string, transformer transform.Transformer) int {
+	source = stringTransform(source, transformer)
+	target = stringTransform(target, transformer)
+
 	lenDiff := len(target) - len(source)
 
 	if lenDiff < 0 {
 		return -1
 	}
-
-	source = stringTransform(source, transformer)
-	target = stringTransform(target, transformer)
 
 	if lenDiff == 0 && source == target {
 		return 0
