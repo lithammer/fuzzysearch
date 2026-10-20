@@ -5,7 +5,7 @@ package fuzzy
 // single-character edits (i.e. insertions, deletions or substitutions)
 // required to change one word into the other.
 //
-// This implemention is optimized to use O(min(m,n)) space and is based on the
+// This implementation is optimized to use O(min(m,n)) space and is based on the
 // optimized C version found here:
 // http://en.wikibooks.org/wiki/Algorithm_implementation/Strings/Levenshtein_distance#C
 func LevenshteinDistance(s, t string) int {
