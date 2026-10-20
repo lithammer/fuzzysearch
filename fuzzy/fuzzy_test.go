@@ -413,3 +413,30 @@ func ExampleRankFind() {
 	fmt.Printf("%+v", RankFind("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
 	// Output: [{Source:whl Target:cartwheel Distance:6 OriginalIndex:0} {Source:whl Target:wheel Distance:2 OriginalIndex:2}]
 }
+
+func TestMatchInvalidUTF8(t *testing.T) {
+	for _, test := range []struct {
+		source, target string
+		want           bool
+		rank           int
+	}{
+		{"\xff", "a\xff", true, 1},
+		{"\xffa", "\xffab", true, 1},
+		{"\xff\xff", "a\xffb\xff", true, 2},
+		{"\xffz", "\xffab", false, -1},
+		{"\ufffda", "\ufffdab", true, 1},
+	} {
+		t.Run(fmt.Sprintf("%q/%q", test.source, test.target), func(t *testing.T) {
+			if got := Match(test.source, test.target); got != test.want {
+				t.Errorf("Match = %v, want %v", got, test.want)
+			}
+			if got := RankMatch(test.source, test.target); got != test.rank {
+				t.Errorf("RankMatch = %v, want %v", got, test.rank)
+			}
+			matches := Find(test.source, []string{test.target})
+			if (len(matches) == 1) != test.want {
+				t.Errorf("Find = %q, want matched=%v", matches, test.want)
+			}
+		})
+	}
+}
