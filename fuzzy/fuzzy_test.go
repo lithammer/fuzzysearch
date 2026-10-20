@@ -413,3 +413,26 @@ func ExampleRankFind() {
 	fmt.Printf("%+v", RankFind("whl", []string{"cartwheel", "foobar", "wheel", "baz"}))
 	// Output: [{Source:whl Target:cartwheel Distance:6 OriginalIndex:0} {Source:whl Target:wheel Distance:2 OriginalIndex:2}]
 }
+
+func TestRankMatchTransformedLength(t *testing.T) {
+	for _, test := range []struct {
+		name           string
+		rank           func(string, string) int
+		source, target string
+		want           int
+	}{
+		{"normalized equal", RankMatchNormalized, "é", "e", 0},
+		{"normalized subsequence", RankMatchNormalized, "éé", "eze", 1},
+		{"normalized combining", RankMatchNormalized, "e\u0301", "e", 0},
+		{"folded equal", RankMatchFold, "K", "k", 0},
+		{"folded subsequence", RankMatchFold, "KK", "kzk", 1},
+		{"normalized folded", RankMatchNormalizedFold, "ÉÉ", "eze", 1},
+		{"not a match", RankMatchNormalized, "éé", "e", -1},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			if got := test.rank(test.source, test.target); got != test.want {
+				t.Errorf("rank(%q, %q) = %d, want %d", test.source, test.target, got, test.want)
+			}
+		})
+	}
+}
