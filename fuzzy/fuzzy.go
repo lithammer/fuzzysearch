@@ -3,6 +3,7 @@
 package fuzzy
 
 import (
+	"math"
 	"unicode"
 	"unicode/utf8"
 
@@ -175,6 +176,47 @@ Outer:
 	runeDiff += utf8.RuneCountInString(target)
 
 	return runeDiff
+}
+
+// MaxDistance is returned by RankDistance when no match is found.
+const MaxDistance = math.MaxInt
+
+// RankDistance is similar to RankMatch, but returns MaxDistance (math.MaxInt)
+// instead of -1 when there is no match. This enables safe minimum and ordering
+// comparisons without negative sentinel values distorting the result.
+func RankDistance(source, target string) int {
+	d := RankMatch(source, target)
+	if d < 0 {
+		return MaxDistance
+	}
+	return d
+}
+
+// RankDistanceFold is a case-insensitive version of RankDistance.
+func RankDistanceFold(source, target string) int {
+	d := RankMatchFold(source, target)
+	if d < 0 {
+		return MaxDistance
+	}
+	return d
+}
+
+// RankDistanceNormalized is a unicode-normalized version of RankDistance.
+func RankDistanceNormalized(source, target string) int {
+	d := RankMatchNormalized(source, target)
+	if d < 0 {
+		return MaxDistance
+	}
+	return d
+}
+
+// RankDistanceNormalizedFold is a unicode-normalized and case-insensitive version of RankDistance.
+func RankDistanceNormalizedFold(source, target string) int {
+	d := RankMatchNormalizedFold(source, target)
+	if d < 0 {
+		return MaxDistance
+	}
+	return d
 }
 
 // RankFind is similar to Find, except it will also rank all matches using
