@@ -2,6 +2,7 @@ package fuzzy
 
 import (
 	"fmt"
+	"reflect"
 	"sort"
 	"strings"
 	"testing"
@@ -111,6 +112,137 @@ func TestFuzzyMatchNormalizedFold(t *testing.T) {
 		if match != val.wanted {
 			t.Errorf("%s in %s expected match to be %t, got %t",
 				val.source, val.target, val.wanted, match)
+		}
+	}
+}
+
+func TestMatchIndices(t *testing.T) {
+	tests := []struct {
+		source string
+		target string
+		wanted []int
+	}{
+		{"twl", "cartwheel", []int{3, 4, 8}},
+		{"cart", "cartwheel", []int{0, 1, 2, 3}},
+		{"cw", "cartwheel", []int{0, 4}},
+		{"ee", "cartwheel", []int{6, 7}},
+		{"art", "cartwheel", []int{1, 2, 3}},
+		{"zazz", "zazz " + deBelloGallico, []int{0, 1, 2, 3}},
+		{"中国", "中华人民共和国", []int{0, 6}},
+		{"ёлка", "ёлочка", []int{0, 1, 4, 5}},
+		{"イ", "イカ", []int{0}},
+		{"eeel", "cartwheel", nil},
+		{"dog", "cartwheel", nil},
+		{"kitten", "setting", nil},
+		{"ветер", "ёлочка", nil},
+		{"日本", "中华人民共和国", nil},
+		{"", "cartwheel", []int{}},
+		{"", "", []int{}},
+		{"a", "", nil},
+		{"cartwheel", "", nil},
+		{"cartwheels", "cartwheel", nil},
+		{"\xffinvalid UTF-8\xff", "", nil},
+		{"Ⱦ", "", nil},
+	}
+
+	for _, tt := range tests {
+		got := MatchIndices(tt.source, tt.target)
+		if !reflect.DeepEqual(got, tt.wanted) {
+			t.Errorf("MatchIndices(%q, %q) = %v; want %v", tt.source, tt.target, got, tt.wanted)
+		}
+	}
+}
+
+func TestMatchIndicesFold(t *testing.T) {
+	tests := []struct {
+		source string
+		target string
+		wanted []int
+	}{
+		{"twl", "CARTWHEEL", []int{3, 4, 8}},
+		{"TWL", "cartwheel", []int{3, 4, 8}},
+		{"cw", "CartWheel", []int{0, 4}},
+		{"CW", "cartwheel", []int{0, 4}},
+		{"ART", "cartwheel", []int{1, 2, 3}},
+		{"中国", "中华人民共和国", []int{0, 6}},
+		{"dog", "CARTWHEEL", nil},
+		{"", "CARTWHEEL", []int{}},
+		{"", "", []int{}},
+		{"A", "", nil},
+	}
+
+	for _, tt := range tests {
+		got := MatchIndicesFold(tt.source, tt.target)
+		if !reflect.DeepEqual(got, tt.wanted) {
+			t.Errorf("MatchIndicesFold(%q, %q) = %v; want %v", tt.source, tt.target, got, tt.wanted)
+		}
+	}
+}
+
+func TestMatchIndicesNormalized(t *testing.T) {
+	tests := []struct {
+		source string
+		target string
+		wanted []int
+	}{
+		{"limon", "limón", []int{0, 1, 2, 3, 4}},
+		{"limón", "limon tart", []int{0, 1, 2, 3, 4}},
+		{"cartwheel", "cartwhéél", []int{0, 1, 2, 3, 4, 5, 6, 7, 8}},
+		{"limón", "LiMóN tArT", nil},
+		{"limón", "LeMoN tArT", nil},
+		{"", "limón", []int{}},
+		{"", "", []int{}},
+		{"limón", "", nil},
+		{"limon", "limo\u0301n", []int{0, 1, 2, 3, 5}},
+	}
+
+	for _, tt := range tests {
+		got := MatchIndicesNormalized(tt.source, tt.target)
+		if !reflect.DeepEqual(got, tt.wanted) {
+			t.Errorf("MatchIndicesNormalized(%q, %q) = %v; want %v", tt.source, tt.target, got, tt.wanted)
+		}
+	}
+}
+
+func TestMatchIndicesNormalizedFold(t *testing.T) {
+	tests := []struct {
+		source string
+		target string
+		wanted []int
+	}{
+		{"limon", "limón", []int{0, 1, 2, 3, 4}},
+		{"limón", "limon tart", []int{0, 1, 2, 3, 4}},
+		{"limón", "LiMóN tArT", []int{0, 1, 2, 3, 4}},
+		{"LIMON", "limón", []int{0, 1, 2, 3, 4}},
+		{"limón", "LeMoN tArT", nil},
+		{"", "LiMóN", []int{}},
+		{"", "", []int{}},
+		{"LiMóN", "", nil},
+		{"limon", "LIMO\u0301N", []int{0, 1, 2, 3, 5}},
+	}
+
+	for _, tt := range tests {
+		got := MatchIndicesNormalizedFold(tt.source, tt.target)
+		if !reflect.DeepEqual(got, tt.wanted) {
+			t.Errorf("MatchIndicesNormalizedFold(%q, %q) = %v; want %v", tt.source, tt.target, got, tt.wanted)
+		}
+	}
+}
+
+func TestMatchIndicesParity(t *testing.T) {
+	for _, val := range fuzzyTests {
+		match := Match(val.source, val.target)
+		indices := MatchIndices(val.source, val.target)
+		if (indices != nil) != match {
+			t.Errorf("MatchIndices parity mismatch for %q in %q: Match=%t, indices=%v",
+				val.source, val.target, match, indices)
+		}
+
+		matchFold := MatchFold(val.source, strings.ToUpper(val.target))
+		indicesFold := MatchIndicesFold(val.source, strings.ToUpper(val.target))
+		if (indicesFold != nil) != matchFold {
+			t.Errorf("MatchIndicesFold parity mismatch for %q in %q: MatchFold=%t, indicesFold=%v",
+				val.source, strings.ToUpper(val.target), matchFold, indicesFold)
 		}
 	}
 }
@@ -434,5 +566,24 @@ func TestRankMatchTransformedLength(t *testing.T) {
 				t.Errorf("rank(%q, %q) = %d, want %d", test.source, test.target, got, test.want)
 			}
 		})
+	}
+}
+
+func ExampleMatchIndices() {
+	fmt.Print(MatchIndices("twl", "cartwheel"))
+	// Output: [3 4 8]
+}
+
+func BenchmarkMatchIndices(b *testing.B) {
+	ft := fuzzyTests[2]
+	for b.Loop() {
+		MatchIndices(ft.source, ft.target)
+	}
+}
+
+func BenchmarkMatchIndicesFold(b *testing.B) {
+	ft := fuzzyTests[2]
+	for b.Loop() {
+		MatchIndicesFold(ft.source, ft.target)
 	}
 }
