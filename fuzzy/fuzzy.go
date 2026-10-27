@@ -264,15 +264,11 @@ func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc
 	// It is possible to write this loop using utf8.DecodeRune
 	// and thereby avoid allocations, but it is noticeably slower.
 	// So just let's wait for the compiler to get smarter.
-	for _, r := range string(src) {
-		if r == utf8.RuneError {
-			// Go spec for ranging over a string says:
-			// If the iteration encounters an invalid UTF-8 sequence,
-			// the second value will be 0xFFFD, the Unicode replacement character,
-			// and the next iteration will advance a single byte in the string.
-			nSrc++
-		} else {
-			nSrc += utf8.RuneLen(r)
+	for i, r := range string(src) {
+		nSrc = i
+		if r == utf8.RuneError && !atEOF && !utf8.FullRune(src[i:]) {
+			err = transform.ErrShortSrc
+			break
 		}
 		r = unicode.ToLower(r)
 		x := utf8.RuneLen(r)
@@ -281,6 +277,9 @@ func (unicodeFoldTransformer) Transform(dst, src []byte, atEOF bool) (nDst, nSrc
 			break
 		}
 		nDst += utf8.EncodeRune(dst[nDst:], r)
+	}
+	if err == nil {
+		nSrc = len(src)
 	}
 	return nDst, nSrc, err
 }

@@ -436,3 +436,37 @@ func TestRankMatchTransformedLength(t *testing.T) {
 		})
 	}
 }
+
+func TestMatchFoldTransformerBuffers(t *testing.T) {
+	for _, test := range []struct {
+		name           string
+		source, target string
+		match          bool
+		rank           int
+	}{
+		{"rune at destination boundary", "é", strings.Repeat("a", 127) + "É", true, 127},
+		{"rune split across source chunks", "éé", strings.Repeat("A", 381) + "ÉÉ", true, 381},
+		{"lowercase grows past destination", strings.Repeat("ⱥ", 50), strings.Repeat("Ⱥ", 50), true, 0},
+		{"replacement character", "ab", "\ufffdAB", true, 1},
+		{"replacement character not repeated", "abab", "\ufffdAB", false, -1},
+		{"replacement character at end", "a", "A\ufffd", true, 1},
+		{"truncated rune at end", "a", "A\xc3", true, 1},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			if got := MatchFold(test.source, test.target); got != test.match {
+				t.Errorf("MatchFold(%q, %q) = %t, want %t", test.source, test.target, got, test.match)
+			}
+			if got := RankMatchFold(test.source, test.target); got != test.rank {
+				t.Errorf("RankMatchFold(%q, %q) = %d, want %d", test.source, test.target, got, test.rank)
+			}
+		})
+	}
+}
+
+func TestFoldTransformerInvalidByte(t *testing.T) {
+	dst := make([]byte, 8)
+	nDst, nSrc, err := foldTransformer().Transform(dst, []byte("A\xffB"), false)
+	if got := string(dst[:nDst]); got != "a\ufffdb" || nSrc != 3 || err != nil {
+		t.Errorf("Transform = %q, %d, %v, want %q, 3, nil", got, nSrc, err, "a\ufffdb")
+	}
+}
