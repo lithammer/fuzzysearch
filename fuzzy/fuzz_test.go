@@ -29,6 +29,10 @@ func FuzzFind(f *testing.F) {
 			MatchFold(n, x)
 			MatchNormalized(n, x)
 			MatchNormalizedFold(n, x)
+			RankDistance(n, x)
+			RankDistanceFold(n, x)
+			RankDistanceNormalized(n, x)
+			RankDistanceNormalizedFold(n, x)
 		}
 	})
 }
