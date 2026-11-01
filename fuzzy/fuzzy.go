@@ -72,7 +72,11 @@ Outer:
 	for _, r1 := range source {
 		for i, r2 := range target {
 			if r1 == r2 {
-				target = target[i+utf8.RuneLen(r2):]
+				size := utf8.RuneLen(r2)
+				if r2 == utf8.RuneError {
+					_, size = utf8.DecodeRuneInString(target[i:])
+				}
+				target = target[i+size:]
 				continue Outer
 			}
 		}
@@ -162,7 +166,11 @@ Outer:
 	for _, r1 := range source {
 		for i, r2 := range target {
 			if r1 == r2 {
-				target = target[i+utf8.RuneLen(r2):]
+				size := utf8.RuneLen(r2)
+				if r2 == utf8.RuneError {
+					_, size = utf8.DecodeRuneInString(target[i:])
+				}
+				target = target[i+size:]
 				continue Outer
 			} else {
 				runeDiff++
