@@ -51,6 +51,85 @@ func MatchNormalizedFold(source, target string) bool {
 	return match(source, target, normalizedFoldTransformer())
 }
 
+// MatchIndices returns a slice of target rune indices that match source sequentially,
+// or nil if no match.
+func MatchIndices(source, target string) []int {
+	return matchIndices(source, target, noopTransformer())
+}
+
+// MatchIndicesFold is a case-insensitive version of MatchIndices.
+func MatchIndicesFold(source, target string) []int {
+	return matchIndices(source, target, foldTransformer())
+}
+
+// MatchIndicesNormalized is a unicode-normalized version of MatchIndices.
+func MatchIndicesNormalized(source, target string) []int {
+	return matchIndices(source, target, normalizeTransformer())
+}
+
+// MatchIndicesNormalizedFold is a unicode-normalized and case-insensitive version of MatchIndices.
+func MatchIndicesNormalizedFold(source, target string) []int {
+	return matchIndices(source, target, normalizedFoldTransformer())
+}
+
+func matchIndices(source, target string, transformer transform.Transformer) []int {
+	if len(source) == 0 {
+		return []int{}
+	}
+	if len(target) == 0 {
+		return nil
+	}
+
+	sourceT := stringTransform(source, transformer)
+	targetT := stringTransform(target, transformer)
+
+	sourceRunes := []rune(sourceT)
+	targetRunes := []rune(targetT)
+
+	if len(sourceRunes) == 0 {
+		return []int{}
+	}
+	if len(targetRunes) < len(sourceRunes) {
+		return nil
+	}
+
+	indices := make([]int, 0, len(sourceRunes))
+	targetIdx := 0
+
+	for _, r1 := range sourceRunes {
+		matched := false
+		for i := targetIdx; i < len(targetRunes); i++ {
+			if r1 == targetRunes[i] {
+				indices = append(indices, i)
+				targetIdx = i + 1
+				matched = true
+				break
+			}
+		}
+		if !matched {
+			return nil
+		}
+	}
+
+	if utf8.RuneCountInString(target) != len(targetRunes) {
+		origIndices := make([]int, 0, len(targetRunes))
+		origRuneIdx := 0
+		for _, r := range target {
+			if !unicode.Is(unicode.Mn, r) {
+				origIndices = append(origIndices, origRuneIdx)
+			}
+			origRuneIdx++
+		}
+		for k, idx := range indices {
+			if idx < len(origIndices) {
+				indices[k] = origIndices[idx]
+			}
+		}
+	}
+
+	return indices
+}
+
 func match(source, target string, transformer transform.Transformer) bool {
 	sourceT := stringTransform(source, transformer)
 	targetT := stringTransform(target, transformer)
